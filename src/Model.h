@@ -19,6 +19,7 @@
 
 #include "vendor/glm/glm.hpp"
 #include "vendor/glm/gtc/matrix_transform.hpp"
+#include "SimpleLogging/SimpleLogging.hpp"
 
 class Model
 {

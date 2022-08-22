@@ -3,8 +3,7 @@
 Model::Model(const std::string&& filePath)
 	:m_FilePath(filePath)
 {
-    //FILE* file = fopen(m_location.c_str(), "r");
-    //fscanf(file, "%f %f %f\n", &normal.x, &normal.y, &normal.z);
+    sl::BeginBenchmark("ModelLoader");
     std::ifstream inputStream;
     std::string stringLine;
 
@@ -224,7 +223,7 @@ Model::Model(const std::string&& filePath)
     GLCall(m_texture->Bind(0));
     GLCall(m_shader->SetInt("u_Texture", 0));
 
-
+    sl::EndBenchmark("ModelLoader");
 }
 void Model::LoadTexture(const std::string&& path)
 {
