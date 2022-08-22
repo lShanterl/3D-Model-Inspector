@@ -1,17 +1,20 @@
 #include "Model.h"
 
-Model::Model(const std::string&& location)
-	:m_location(location)
+Model::Model(const std::string&& filePath)
+	:m_FilePath(filePath)
 {
     //FILE* file = fopen(m_location.c_str(), "r");
     //fscanf(file, "%f %f %f\n", &normal.x, &normal.y, &normal.z);
     std::ifstream inputStream;
     std::string stringLine;
 
-    inputStream.open(m_location);
+    inputStream.open(m_FilePath);
 
     if (!inputStream.is_open())
-        std::cout << "sadek\n";
+    {
+        std::cout << "OBJ FILE NOT FOUND!\n";
+
+    }
 
     std::vector<glm::vec3> vPositions;
     std::vector<glm::vec2> vTexCoords;
@@ -213,7 +216,7 @@ Model::Model(const std::string&& location)
     layout.Push<float>(2);
     layout.Push<float>(3);
 
-    m_texture = new Texture("D:/Projekty Blender/vendor/backpack_albedo.jpg");
+    m_texture = new Texture("res/textures/backpack_albedo.jpg");
 
     GLCall(m_vao = new VertexArray(vertices.data(), sizeof(vertices[0]) * vertices.size(), layout));
     //GLCall(m_ib = new IndexBuffer(iPositions.data(), iPositions.size()));

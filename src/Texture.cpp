@@ -12,7 +12,7 @@ Texture::Texture(const std::string& path)
 	if (m_LocalBuffer == NULL)
 	{
 		std::cout << "image has not loaded succesfully";
-		m_LocalBuffer = stbi_load("D:/Projekty Blender/vendor/download.png", &m_Width, &m_Height, &m_BPP, 4);
+		m_LocalBuffer = stbi_load("res/textures/MissingTexture.png", &m_Width, &m_Height, &m_BPP, 4);
 	}
 	
 	GLCall(glGenTextures(1, &m_RendererID));

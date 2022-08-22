@@ -66,7 +66,7 @@ int main()
 
         glEnable(GL_DEPTH_TEST);
 
-        Model modelObj("D:/Projekty Blender/vendor/backpack.obj");
+        Model modelObj("res/models/backpack.obj");
 
         glfwSetCursorPosCallback(window, Camera::mouse_callback);
         glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);

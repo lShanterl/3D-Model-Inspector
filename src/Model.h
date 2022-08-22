@@ -35,7 +35,7 @@ public:
 	void LoadTexture(const std::string&& path);
 
 private:
-	std::string m_location;
+	std::string m_FilePath;
 	glm::vec3 vertPos;	
 };
 #endif
