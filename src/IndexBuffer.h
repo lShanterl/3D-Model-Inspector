@@ -11,7 +11,6 @@ class IndexBuffer
 {
 public:
 	IndexBuffer(unsigned int* data, unsigned int count);
-	//IndexBuffer(Vertex* vertices, unsigned int count);
 	~IndexBuffer();
 
 	const unsigned int& GetCount() const { return m_Count; }
