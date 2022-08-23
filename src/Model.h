@@ -15,7 +15,6 @@
 #include "Shader.h"
 #include "Texture.hpp"
 #include "Vertex.h"
-#include "Mesh.hpp"
 
 #include "vendor/glm/glm.hpp"
 #include "vendor/glm/gtc/matrix_transform.hpp"

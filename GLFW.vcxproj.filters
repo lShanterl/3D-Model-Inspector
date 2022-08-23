@@ -120,9 +120,6 @@
     <ClInclude Include="src\Light.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Mesh.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\vendor\imgui\imgui.h">
       <Filter>Header Files</Filter>
     </ClInclude>

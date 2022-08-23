@@ -12,7 +12,6 @@ Model::Model(const std::string&& filePath)
     if (!inputStream.is_open())
     {
         std::cout << "OBJ FILE NOT FOUND!\n";
-
     }
 
     std::vector<glm::vec3> vPositions;
@@ -89,18 +88,7 @@ Model::Model(const std::string&& filePath)
                     ss >> v; 
             }
 
-            if (verticesCount[3] == "")
-            {
-                vertAmount = 3;
-
-            }
-            else
-            {
-                vertAmount = 4;
-                
-            }
-
-            if (vertAmount == 4)
+            if (verticesCount[3] != "")
             {
                 std::string vertices[4];
 
@@ -142,33 +130,33 @@ Model::Model(const std::string&& filePath)
                 }
                 //std::cout << "[DONE] inserting to quads\n";
 				
-                iPositions.push_back(quadPos[0]);
-                iTexCoords.push_back(quadTextCoord[0]);
-                iNormals.push_back(quadNormals[0]);
+                iPositions.emplace_back(quadPos[0]);
+                iTexCoords.emplace_back(quadTextCoord[0]);
+                iNormals.emplace_back(quadNormals[0]);
 				
-                iPositions.push_back(quadPos[1]);
-                iTexCoords.push_back(quadTextCoord[1]);
-                iNormals.push_back(quadNormals[1]);
+                iPositions.emplace_back(quadPos[1]);
+                iTexCoords.emplace_back(quadTextCoord[1]);
+                iNormals.emplace_back(quadNormals[1]);
 				
-                iPositions.push_back(quadPos[2]);
-                iTexCoords.push_back(quadTextCoord[2]);
-                iNormals.push_back(quadNormals[2]);
+                iPositions.emplace_back(quadPos[2]);
+                iTexCoords.emplace_back(quadTextCoord[2]);
+                iNormals.emplace_back(quadNormals[2]);
 
-				iPositions.push_back(quadPos[0]);
-				iTexCoords.push_back(quadTextCoord[0]);
-				iNormals.push_back(quadNormals[0]);
+				iPositions.emplace_back(quadPos[0]);
+				iTexCoords.emplace_back(quadTextCoord[0]);
+				iNormals.emplace_back(quadNormals[0]);
 
-				iPositions.push_back(quadPos[2]);
-				iTexCoords.push_back(quadTextCoord[2]);
-				iNormals.push_back(quadNormals[2]);
+				iPositions.emplace_back(quadPos[2]);
+				iTexCoords.emplace_back(quadTextCoord[2]);
+				iNormals.emplace_back(quadNormals[2]);
 
-				iPositions.push_back(quadPos[3]);
-				iTexCoords.push_back(quadTextCoord[3]);
-				iNormals.push_back(quadNormals[3]);
+				iPositions.emplace_back(quadPos[3]);
+				iTexCoords.emplace_back(quadTextCoord[3]);
+				iNormals.emplace_back(quadNormals[3]);
                 
                 //std::cout << "[DONE] ipushes\n";
 			}			
-            else if (vertAmount == 3)
+            else if (verticesCount[3] == "")
             {
                 std::string vertices[3];
 
@@ -182,13 +170,13 @@ Model::Model(const std::string&& filePath)
                     str.reserve(8);
 
                     std::getline(ss, str, '/');
-                    iPositions.push_back(std::stoi(str));
+                    iPositions.emplace_back(std::stoi(str));
 
                     std::getline(ss, str, '/');
-                    iTexCoords.push_back(std::stoi(str));
+                    iTexCoords.emplace_back(std::stoi(str));
 
                     std::getline(ss, str, '/');
-                    iNormals.push_back(std::stoi(str));
+                    iNormals.emplace_back(std::stoi(str));
                 }
             }
             //std::cout << "[DONE] if statement \n\n" << std::endl;

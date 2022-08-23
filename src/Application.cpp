@@ -1,50 +1,40 @@
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#include "Application.hpp"
 
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
+GLFWwindow* window;
+Camera* camera;
+Model* mesh;
+Renderer* renderer;
+Light* light;
+constexpr int width = 640, height = 480;
 
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <utility>
-#include <memory>
+//mvp
+glm::mat4 view;
+glm::mat4 model = glm::mat4(1.0f);
+glm::mat4 proj;
+glm::mat4 mvp;
 
-#include "Renderer.h"
-#include "IndexBuffer.h"
-#include "VertexArray.h"
-#include "Shader.h"
-#include "Texture.hpp"
-#include "vendor/glm/glm.hpp"
-#include "vendor/glm/gtc/matrix_transform.hpp"
-#include "Camera.hpp"
-#include "Model.h"
-#include "Light.hpp"
+bool bIsRunning = true;
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+
+void Application::framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
-    glViewport(0, 0, width, height);
-
+	glViewport(0, 0, width, height);
 }
 
-int main()
+
+void Application::Init()
 {
-    GLFWwindow* window;
-    constexpr int width = 640,height = 480;
-
-
-    /* Initialize the library */
+    /* Initialize the glfw */
 
     if (!glfwInit())
-        return -1;
+        bIsRunning = false;
 
     /* Create a windowed mode window and its OpenGL context */
     window = glfwCreateWindow(width, height, "Obj Model Inspector", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
-        return -1;
+        bIsRunning = false;
     }
 
     /* Make the window's context current */
@@ -52,78 +42,102 @@ int main()
 
     glfwSwapInterval(1);
 
+    glEnable(GL_DEPTH_TEST);
+
+    glfwSetCursorPosCallback(window, Camera::mouse_callback);
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
+    //Check if glew works
     if (glewInit() != GLEW_OK)
         std::cout << "Error! \n";
 
+
+    //opengl version
     std::cout << glGetString(GL_VERSION) << std::endl;
 
-    
-        Camera camera(glm::vec3(0.0f, -2.0f, 3.0f), 90.0f, width, height);
-        glm::mat4 view = camera.GetView();
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::scale(model, glm::vec3(1));
-	    Renderer renderer;
+    // ImGui init
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGui::StyleColorsDark();
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init("#version 330");
 
-        glEnable(GL_DEPTH_TEST);
+    //initialize required objects
+    camera = new Camera(glm::vec3(0.0f, -2.0f, 3.0f), 90.0f, width, height);
+    renderer = new Renderer;
+    view = camera->GetView();
+    model = glm::scale(model, glm::vec3(1));
 
-        Model modelObj("res/models/backpack.obj");
+    mesh = new Model("res/models/backpack.obj");
 
-        glfwSetCursorPosCallback(window, Camera::mouse_callback);
-        glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    light = new Light;
+}
 
-        Light light;
+void Application::Update()
+{
+    while (!glfwWindowShouldClose(window))
+    {
+        /* Render here */
+        int width, height;
+        glfwGetFramebufferSize(window, &width, &height);
+        proj = camera->GetProj(width, height);
 
-        IMGUI_CHECKVERSION();
-        ImGui::CreateContext();
-        ImGuiIO& io = ImGui::GetIO(); (void)io;
-        ImGui::StyleColorsDark();
-        ImGui_ImplGlfw_InitForOpenGL(window, true);
-        ImGui_ImplOpenGL3_Init("#version 330");
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
 
-        while (!glfwWindowShouldClose(window))
-        {
-            /* Render here */
-            int width, height;
-            glfwGetFramebufferSize(window, &width, &height);
-            glm::mat4 proj = camera.GetProj(width, height);
-            renderer.Clear();
+        camera->ProcessInput(window);
 
-            ImGui_ImplOpenGL3_NewFrame();
-            ImGui_ImplGlfw_NewFrame();
-            ImGui::NewFrame();
+        camera->CameraFocusing(window);
 
-            camera.ProcessInput(window);
+        mvp = proj * camera->GetView() * model;
 
-            camera.CameraFocusing(window);
+        renderer->Clear();
 
-            glm::mat4 mvp = proj * camera.GetView() * model;
-            
-            modelObj.m_shader->SetVec3f("lightPos", light.GetLightPos().x, light.GetLightPos().y, light.GetLightPos().z);
+        mesh->m_shader->SetVec3f("lightPos", light->GetLightPos().x, light->GetLightPos().y, light->GetLightPos().z);
 
-            modelObj.m_shader->SetMatrix4f("model", model);
-            modelObj.m_shader->SetMatrix4f("view", camera.GetView());
-            modelObj.m_shader->SetMatrix4f("projection", proj);
-            modelObj.m_shader->SetVec4f("u_Color", 1.0f, 0.5f, 0.31f, 1.0f);
-            modelObj.m_shader->SetVec3f("objectColor", 1.0f, 1.0f, 1.0f);
-            modelObj.m_shader->SetVec3f("lightColor", 0.75f, 1.0f, 0.85f);
-            modelObj.m_shader->SetMatrix4f("u_MVP", mvp);
+        mesh->m_shader->SetMatrix4f("model", model);
+        mesh->m_shader->SetMatrix4f("view", camera->GetView());
+        mesh->m_shader->SetMatrix4f("projection", proj);
 
-            GLCall(renderer.Draw(*modelObj.m_vao, *modelObj.m_ib, *modelObj.m_shader));
+        mesh->m_shader->SetVec3f("objectColor", 1.0f, 1.0f, 1.0f);
+        mesh->m_shader->SetVec3f("lightColor", light->m_LightCol.x, light->m_LightCol.y, light->m_LightCol.z);
+        mesh->m_shader->SetMatrix4f("u_MVP", mvp);
 
-            ImGui::Begin("Hello World!");
-            ImGui::Text("Waltuh");
-            ImGui::End();
+        GLCall(renderer->Draw(*mesh->m_vao, *mesh->m_ib, *mesh->m_shader));
 
-            ImGui::Render();
-            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        //ImGui
+        ImGui::Begin("Hello World!");
+        ImGui::ColorEdit3("lightColor", (float*)&light->m_LightCol);
+        //ImGui::
+        ImGui::End();
 
-            /* Swap front and back buffers */
-            glfwSwapBuffers(window);
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-            /* Poll for and process events */
-            glfwPollEvents();
-        }
-    
-        glfwTerminate();
-        return 0;
+        /* Swap front and back buffers */
+        glfwSwapBuffers(window);
+
+        /* Poll for and process events */
+        glfwPollEvents();
+        bIsRunning = false;
+    }
+
+}
+
+
+void Application::Exit()
+{
+    glfwTerminate();
+
+    delete(camera);
+    delete(renderer);
+    delete(mesh);
+    delete(light);
+}
+
+bool Application::IsRunning()
+{
+    return bIsRunning;
 }
