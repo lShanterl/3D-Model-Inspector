@@ -5,16 +5,20 @@ Camera* camera;
 Model* mesh;
 Renderer* renderer;
 Light* light;
-constexpr int width = 640, height = 480;
+
+
+constexpr int width = 1920, height = 1080;
 
 //mvp
 glm::mat4 view;
 glm::mat4 model = glm::mat4(1.0f);
 glm::mat4 proj;
 glm::mat4 mvp;
+char modelPath[100] = "";
+char texPath[100] = "";
 
 bool bIsRunning = true;
-
+bool useTexAlbedo = false;
 
 void Application::framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -69,7 +73,11 @@ void Application::Init()
     view = camera->GetView();
     model = glm::scale(model, glm::vec3(1));
 
+
+
     mesh = new Model("res/models/backpack.obj");
+    mesh->LoadTexture("res/textures/backpack_albedo.jpg");
+
 
     light = new Light;
 }
@@ -108,9 +116,56 @@ void Application::Update()
         GLCall(renderer->Draw(*mesh->m_vao, *mesh->m_ib, *mesh->m_shader));
 
         //ImGui
-        ImGui::Begin("Hello World!");
-        ImGui::ColorEdit3("lightColor", (float*)&light->m_LightCol);
-        //ImGui::
+        ImGui::Begin("Model Inspector");
+        if(ImGui::TreeNode("Lights"))
+        {
+            ImGui::ColorEdit3("lightColor", (float*)&light->m_LightCol);
+            ImGui::TreePop();
+        }
+        ImGui::SetNextItemOpen(true);
+        if (ImGui::TreeNode("Model Loader"))
+        {
+
+            ImGui::Spacing();
+
+            ImGui::Checkbox("Use Albedo Texture", &useTexAlbedo);
+
+
+            ImGui::InputText("model path", modelPath, sizeof(char) * 100);
+            if (useTexAlbedo)
+            {
+                if (ImGui::InputText("albedo texture path", texPath, sizeof(char) * 100));
+
+            }
+            if (ImGui::Button("Load Model and Texture"))
+            {
+                if (useTexAlbedo)
+                {
+                    delete(mesh);
+                    sl::BeginBenchmark("modelLoader");
+                    mesh = new Model(modelPath);
+                    mesh->LoadTexture(texPath);
+                    sl::EndBenchmark("modelLoader");
+                }
+                else
+                {
+                    delete(mesh);
+                    sl::BeginBenchmark("modelLoader");
+                    mesh = new Model(modelPath);
+                    mesh->LoadTexture("res/textures/white.png");
+                    sl::EndBenchmark("modelLoader");
+                }
+            }
+            ImGui::TreePop();
+
+            if (ImGui::TreeNode("Camera"))
+            {
+                ImGui::InputFloat("Movement speed", &camera->m_movementSpeed, 0.1f);
+                ImGui::TreePop();
+            }
+
+        }
+               
         ImGui::End();
 
         ImGui::Render();
@@ -125,7 +180,6 @@ void Application::Update()
     }
 
 }
-
 
 void Application::Exit()
 {

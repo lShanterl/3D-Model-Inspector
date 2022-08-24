@@ -11,7 +11,7 @@ Texture::Texture(const std::string& path)
 	
 	if (m_LocalBuffer == NULL)
 	{
-		std::cout << "image has not loaded succesfully";
+		std::cout << "image has not loaded succesfully\n";
 		m_LocalBuffer = stbi_load("res/textures/MissingTexture.png", &m_Width, &m_Height, &m_BPP, 4);
 	}
 	

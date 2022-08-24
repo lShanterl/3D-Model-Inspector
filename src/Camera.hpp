@@ -10,10 +10,11 @@
 #include "vendor/glm/gtc/matrix_transform.hpp"
 class Camera {
 public:
-	const float m_movementSpeed = 5.5f;
+	float m_movementSpeed = 5.5f;
 	const float m_mouseSensitivity = 0.20f;
 	float m_Yaw = -90.0f;
 	float m_Pitch = 0.0f;
+	float m_Fov;
 	bool isFocused = false;
 
 	glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
@@ -35,7 +36,6 @@ public:
 	void UpdateCameraVectors();
 
 private:
-	float m_Fov;
 	float m_lastX, m_lastY;
 	bool m_firstMouse = true;
 

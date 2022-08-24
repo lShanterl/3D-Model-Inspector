@@ -24,8 +24,6 @@ class Model
 {
 public:
 	Model(const std::string&& location);
-	
-	void CreateModel();
 
 	VertexArray* m_vao;
 	IndexBuffer* m_ib;
@@ -36,6 +34,7 @@ public:
 
 private:
 	std::string m_FilePath;
+	std::string m_TexturePath;
 	glm::vec3 vertPos;	
 };
 #endif

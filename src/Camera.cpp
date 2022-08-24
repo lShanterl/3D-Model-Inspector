@@ -19,20 +19,24 @@ glm::mat4 Camera::GetView()
 }
 void Camera::ProcessInput(GLFWwindow* window)
 {
-    float deltaTime = 0.0f;	
-    static float lastFrame = 0.0f;
-    float currentFrame = glfwGetTime();
-    deltaTime = currentFrame - lastFrame;
-    lastFrame = currentFrame;
-    float m_Speed = m_movementSpeed * deltaTime;
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        m_Position += m_Speed * cameraFront;
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        m_Position -= m_Speed * cameraFront;
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        m_Position -= glm::normalize(glm::cross(cameraFront, cameraUp)) * m_Speed;
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        m_Position += glm::normalize(glm::cross(cameraFront, cameraUp)) * m_Speed;
+        float deltaTime = 0.0f;
+        static float lastFrame = 0.0f;
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+        float m_Speed = m_movementSpeed * deltaTime;
+    if (isFocused)
+    {
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+            m_Position += m_Speed * cameraFront;
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+            m_Position -= m_Speed * cameraFront;
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+            m_Position -= glm::normalize(glm::cross(cameraFront, cameraUp)) * m_Speed;
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+            m_Position += glm::normalize(glm::cross(cameraFront, cameraUp)) * m_Speed;
+    }
+    
 }
 
 

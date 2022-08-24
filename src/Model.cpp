@@ -3,7 +3,6 @@
 Model::Model(const std::string&& filePath)
 	:m_FilePath(filePath)
 {
-    sl::BeginBenchmark("ModelLoader");
     std::ifstream inputStream;
     std::string stringLine;
 
@@ -203,15 +202,14 @@ Model::Model(const std::string&& filePath)
     layout.Push<float>(2);
     layout.Push<float>(3);
 
-    m_texture = new Texture("res/textures/backpack_albedo.jpg");
+    //m_texture = new Texture("res/textures/backpack_albedo.jpg");
 
     GLCall(m_vao = new VertexArray(vertices.data(), sizeof(vertices[0]) * vertices.size(), layout));
     //GLCall(m_ib = new IndexBuffer(iPositions.data(), iPositions.size()));
     GLCall(m_shader = new Shader("res/shaders/basicVertex.glsl", "res/shaders/lightFrag.glsl"));
-    GLCall(m_texture->Bind(0));
-    GLCall(m_shader->SetInt("u_Texture", 0));
+    //GLCall(m_texture->Bind(0));
+    //GLCall(m_shader->SetInt("u_Texture", 0));
 
-    sl::EndBenchmark("ModelLoader");
 }
 void Model::LoadTexture(const std::string&& path)
 {
@@ -220,4 +218,5 @@ void Model::LoadTexture(const std::string&& path)
 
 	m_texture = new Texture(path);
     GLCall(m_texture->Bind(0));
+    GLCall(m_shader->SetInt("u_Texture", 0));
 }
