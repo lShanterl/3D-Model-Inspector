@@ -12,13 +12,13 @@ public:
 	Light();
 	~Light();
 
-	glm::vec3 m_lightPos = glm::vec3(3.2f, 1.0f, 2.0f);
+	glm::vec3 m_lightDir = glm::vec3(2.5f, 1.0f, 2.0f);
 
 	glm::vec3 m_LightCol = glm::vec3(1.0f,1.0f,1.0f);
 
 	glm::vec3 intensity;
 	float ambientStrength = 0.1;
-	glm::vec3 GetLightPos();
+	glm::vec3 GetlightDir();
 
     
 private:

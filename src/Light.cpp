@@ -9,7 +9,7 @@ Light::~Light()
 {
 }
 
-glm::vec3 Light::GetLightPos()
+glm::vec3 Light::GetlightDir()
 {
-	return m_lightPos;
+	return m_lightDir;
 }

@@ -5,8 +5,7 @@ Camera* camera;
 Model* mesh;
 Renderer* renderer;
 Light* light;
-
-
+ 
 constexpr int width = 1920, height = 1080;
 
 //mvp
@@ -14,8 +13,10 @@ glm::mat4 view;
 glm::mat4 model = glm::mat4(1.0f);
 glm::mat4 proj;
 glm::mat4 mvp;
+
+
 char modelPath[100] = "";
-char texPath[100] = "";
+char albedoTexPath[100] = "";
 
 bool bIsRunning = true;
 bool useTexAlbedo = false;
@@ -25,16 +26,28 @@ void Application::framebuffer_size_callback(GLFWwindow* window, int width, int h
 	glViewport(0, 0, width, height);
 }
 
-
 void Application::Init()
 {
     /* Initialize the glfw */
 
     if (!glfwInit())
         bIsRunning = false;
+    /*GLFWmonitor* primary = glfwGetPrimaryMonitor();
+    const GLFWvidmode* mode = glfwGetVideoMode(primary);
+    glfwWindowHint(GLFW_RED_BITS, mode->redBits);
+    glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
+    glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
+    glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+
+    glfwWindowHint(GLFW_AUTO_ICONIFY, GL_FALSE);
+
+    glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+
+    glfwWindowHint(GLFW_FLOATING, GL_TRUE);
+    glfwWindowHint(GLFW_DECORATED, GL_FALSE);*/
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(width, height, "Obj Model Inspector", NULL, NULL);
+    window = glfwCreateWindow(width, height, "Obj Model Inspector",NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -103,23 +116,27 @@ void Application::Update()
 
         renderer->Clear();
 
-        mesh->m_shader->SetVec3f("lightPos", light->GetLightPos().x, light->GetLightPos().y, light->GetLightPos().z);
+        mesh->m_shader->SetVec3f("lightDir", light->GetlightDir().x, light->GetlightDir().y, light->GetlightDir().z);
 
         mesh->m_shader->SetMatrix4f("model", model);
         mesh->m_shader->SetMatrix4f("view", camera->GetView());
         mesh->m_shader->SetMatrix4f("projection", proj);
 
         mesh->m_shader->SetVec3f("objectColor", 1.0f, 1.0f, 1.0f);
+        mesh->m_shader->SetVec3f("viewPos", camera->m_Position.x,camera->m_Position.y, camera->m_Position.z);
         mesh->m_shader->SetVec3f("lightColor", light->m_LightCol.x, light->m_LightCol.y, light->m_LightCol.z);
         mesh->m_shader->SetMatrix4f("u_MVP", mvp);
 
+
         GLCall(renderer->Draw(*mesh->m_vao, *mesh->m_ib, *mesh->m_shader));
 
-        //ImGui
+        //ImGui     
+
         ImGui::Begin("Model Inspector");
         if(ImGui::TreeNode("Lights"))
         {
             ImGui::ColorEdit3("lightColor", (float*)&light->m_LightCol);
+            ImGui::SliderFloat3("light Position", (float*) &light->m_lightDir, -10.0f, 10.0f);
             ImGui::TreePop();
         }
         ImGui::SetNextItemOpen(true);
@@ -134,7 +151,7 @@ void Application::Update()
             ImGui::InputText("model path", modelPath, sizeof(char) * 100);
             if (useTexAlbedo)
             {
-                if (ImGui::InputText("albedo texture path", texPath, sizeof(char) * 100));
+                if (ImGui::InputText("albedo texture path", albedoTexPath, sizeof(char) * 100));
 
             }
             if (ImGui::Button("Load Model and Texture"))
@@ -144,7 +161,7 @@ void Application::Update()
                     delete(mesh);
                     sl::BeginBenchmark("modelLoader");
                     mesh = new Model(modelPath);
-                    mesh->LoadTexture(texPath);
+                    mesh->LoadTexture(albedoTexPath);
                     sl::EndBenchmark("modelLoader");
                 }
                 else
@@ -160,11 +177,12 @@ void Application::Update()
 
             if (ImGui::TreeNode("Camera"))
             {
-                ImGui::InputFloat("Movement speed", &camera->m_movementSpeed, 0.1f);
+                ImGui::DragFloat("Movement speed", &camera->m_movementSpeed, 0.1f, 0.1f, 25.0f,"%.3f", ImGuiSliderFlags_AlwaysClamp);
                 ImGui::TreePop();
             }
 
         }
+        
                
         ImGui::End();
 
