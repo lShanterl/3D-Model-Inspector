@@ -30,6 +30,7 @@
 #include "Camera.hpp"
 #include "Model.h"
 #include "Light.hpp"
+#include "Material.hpp"
 
 
 namespace Application

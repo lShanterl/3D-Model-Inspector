@@ -53,6 +53,7 @@
     <ClInclude Include="src\Commons.h" />
     <ClInclude Include="src\IndexBuffer.h" />
     <ClInclude Include="src\Light.hpp" />
+    <ClInclude Include="src\Material.hpp" />
     <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\Shader.h" />

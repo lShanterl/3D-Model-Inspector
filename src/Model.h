@@ -12,9 +12,8 @@
 #include "Renderer.h"
 #include "IndexBuffer.h"
 #include "VertexArray.h"
-#include "Shader.h"
-#include "Texture.hpp"
 #include "Vertex.h"
+#include "Material.hpp"
 
 #include "vendor/glm/glm.hpp"
 #include "vendor/glm/gtc/matrix_transform.hpp"
@@ -23,12 +22,11 @@
 class Model
 {
 public:
-	Model(const std::string&& location);
+	Model(const std::string&& location, Material* material);
 
 	VertexArray* m_vao;
 	IndexBuffer* m_ib;
-	Shader* m_shader;
-	Texture* m_texture;
+	Material* m_material;
 
 	void LoadTexture(const std::string&& path);
 

@@ -147,5 +147,8 @@
     <ClInclude Include="src\SimpleLogging\SimpleLogging.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Material.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,7 +1,7 @@
 #include "Model.h"
 
-Model::Model(const std::string&& filePath)
-	:m_FilePath(filePath)
+Model::Model(const std::string&& filePath, Material* material)
+    :m_FilePath(filePath), m_material(material)
 {
     std::ifstream inputStream;
     std::string stringLine;
@@ -202,21 +202,20 @@ Model::Model(const std::string&& filePath)
     layout.Push<float>(2);
     layout.Push<float>(3);
 
-    //m_texture = new Texture("res/textures/backpack_albedo.jpg");
-
     GLCall(m_vao = new VertexArray(vertices.data(), sizeof(vertices[0]) * vertices.size(), layout));
-    //GLCall(m_ib = new IndexBuffer(iPositions.data(), iPositions.size()));
-    GLCall(m_shader = new Shader("res/shaders/basicVertex.glsl", "res/shaders/lightFrag.glsl"));
-    //GLCall(m_texture->Bind(0));
-    //GLCall(m_shader->SetInt("u_Texture", 0));
+
+    glActiveTexture(GL_TEXTURE0);
+    m_material->albedoTexture->Bind(0);
+    m_material->m_shader->SetInt("u_Texture", 0 );
+
+    glActiveTexture(GL_TEXTURE1);
+    if (m_material->specularTexture != nullptr)
+    {
+        m_material->specularTexture->Bind(1);
+        m_material->m_shader->SetInt("u_specularTexture", 1);
+    }
+        
+
 
 }
-void Model::LoadTexture(const std::string&& path)
-{
-    if(!m_texture != 0)
-        delete(m_texture);
 
-	m_texture = new Texture(path);
-    GLCall(m_texture->Bind(0));
-    GLCall(m_shader->SetInt("u_Texture", 0));
-}
