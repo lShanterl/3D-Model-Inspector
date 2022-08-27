@@ -39,7 +39,9 @@ void Application::Init()
     if (!glfwInit())
         bIsRunning = false;
 
-
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     /* Create a windowed mode window and its OpenGL context */
     window = glfwCreateWindow(width, height, "Obj Model Inspector",NULL, NULL);
@@ -83,8 +85,9 @@ void Application::Init()
     shader = new Shader("res/shaders/basicVertex.glsl","res/shaders/LightFrag.glsl");
 
     albedoTexture = new Texture("res/textures/backpack_albedo.jpg");
+    specularTexture = new Texture("res/textures/backpack_specular.jpg");
 
-    material = new Material(albedoTexture, nullptr , shader);
+    material = new Material(albedoTexture, specularTexture , shader);
 
     mesh = new Model("res/models/backpack.obj", material);
 
@@ -112,16 +115,21 @@ void Application::Update()
 
         renderer->Clear();
 
-        material->m_shader->SetVec3f("lightDir", light->GetlightDir().x, light->GetlightDir().y, light->GetlightDir().z);
-
+        //mvp
         material->m_shader->SetMatrix4f("model", model);
         material->m_shader->SetMatrix4f("view", camera->GetView());
         material->m_shader->SetMatrix4f("projection", proj);
+        material->m_shader->SetMatrix4f("u_MVP", mvp);
 
-        material->m_shader->SetVec3f("objectColor", 1.0f, 1.0f, 1.0f);
+        //lighting
         material->m_shader->SetVec3f("viewPos", camera->m_Position.x,camera->m_Position.y, camera->m_Position.z);
         material->m_shader->SetVec3f("lightColor", light->m_LightCol.x, light->m_LightCol.y, light->m_LightCol.z);
-        material->m_shader->SetMatrix4f("u_MVP", mvp);
+        material->m_shader->SetVec3f("lightDir", light->GetlightDir().x, light->GetlightDir().y, light->GetlightDir().z);
+
+        //material properties
+        material->m_shader->SetVec3f("material.ambient", material->ambient.x, material->ambient.y, material->ambient.z);
+        //material->m_shader->SetVec3f("material.specular", material->specular.x, material->specular.y, material->specular.z);
+        material->m_shader->SetFloat("material.shininess", material->shininess);
 
 
         GLCall(renderer->Draw(*mesh->m_vao, *mesh->m_ib, *material->m_shader));
@@ -180,7 +188,8 @@ void Application::Update()
                 }
                 else
                 {
-                    specularTexture = new Texture("res/textures/white.png");
+                    unsigned char darkGray[4] = {36,36,36,255};
+                    specularTexture = new Texture(darkGray,1,1);
                 }
                 
                 material = new Material(albedoTexture, specularTexture, shader);

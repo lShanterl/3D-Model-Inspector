@@ -204,15 +204,19 @@ Model::Model(const std::string&& filePath, Material* material)
 
     GLCall(m_vao = new VertexArray(vertices.data(), sizeof(vertices[0]) * vertices.size(), layout));
 
-    glActiveTexture(GL_TEXTURE0);
-    m_material->albedoTexture->Bind(0);
-    m_material->m_shader->SetInt("u_Texture", 0 );
+    if (m_material->albedoTexture != nullptr)
+    {
+        glActiveTexture(GL_TEXTURE0);
+        m_material->albedoTexture->Bind(0);
+        m_material->m_shader->SetInt("material.diffuse", 0);
+    }
 
-    glActiveTexture(GL_TEXTURE1);
+
     if (m_material->specularTexture != nullptr)
     {
+        glActiveTexture(GL_TEXTURE1);
         m_material->specularTexture->Bind(1);
-        m_material->m_shader->SetInt("u_specularTexture", 1);
+        m_material->m_shader->SetInt("material.specular", 1);
     }
         
 

@@ -41,11 +41,8 @@
     <ClCompile Include="src\VertexArray.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\shaders\basicFrag.glsl" />
     <None Include="res\shaders\basicVertex.glsl" />
     <None Include="res\shaders\LightFrag.glsl" />
-    <None Include="res\shaders\LightFragSource.glsl" />
-    <None Include="res\shaders\LightingVs.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Application.hpp" />

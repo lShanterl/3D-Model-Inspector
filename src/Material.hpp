@@ -20,8 +20,10 @@ struct Material
 	Texture* albedoTexture;
 	Texture* specularTexture;
 	Shader* m_shader;
-	float shininess;
-	glm::vec3 diffuse;
+	float shininess = 24.0f;
+	glm::vec3 ambient = glm::vec3(0.04);
+	glm::vec3 specular = { 0.5f, 0.5f, 0.5f };
+
 
 };
 
