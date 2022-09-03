@@ -16,6 +16,7 @@
 #include <string>
 #include <utility>
 #include <memory>
+#include <array>
 
 //GLM
 #include "vendor/glm/glm.hpp"

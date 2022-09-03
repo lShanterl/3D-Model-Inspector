@@ -33,8 +33,6 @@ public:
 
 	void CameraFocusing(GLFWwindow* window);
 
-	void UpdateCameraVectors();
-
 private:
 	float m_lastX, m_lastY;
 	bool m_firstMouse = true;
