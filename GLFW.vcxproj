@@ -22,6 +22,7 @@
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Commons.cpp" />
+    <ClCompile Include="src\Editor.cpp" />
     <ClCompile Include="src\IndexBuffer.cpp" />
     <ClCompile Include="src\Light.cpp" />
     <ClCompile Include="src\Main.cpp" />
@@ -48,6 +49,7 @@
     <ClInclude Include="src\Application.hpp" />
     <ClInclude Include="src\Camera.hpp" />
     <ClInclude Include="src\Commons.h" />
+    <ClInclude Include="src\Editor.hpp" />
     <ClInclude Include="src\IndexBuffer.h" />
     <ClInclude Include="src\Light.hpp" />
     <ClInclude Include="src\Material.hpp" />

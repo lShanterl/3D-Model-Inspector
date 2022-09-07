@@ -32,6 +32,7 @@
 #include "Model.h"
 #include "Light.hpp"
 #include "Material.hpp"
+#include "Editor.hpp"
 
 
 namespace Application

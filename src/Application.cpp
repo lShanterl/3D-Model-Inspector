@@ -4,13 +4,13 @@ GLFWwindow* window;
 Camera* camera;
 Model* mesh;
 Renderer* renderer;
-Light* light;
+
 Material* material;
 Texture* albedoTexture;
 Texture* specularTexture;
 Shader* shader;
 DirLight* dirLight;
-PointLight* pointLight;
+
  
 constexpr int width = 1920, height = 1080;
 
@@ -29,8 +29,16 @@ bool bIsRunning = true;
 bool useTexAlbedo = false;
 bool useTexSpecular = false;
 
-const uint16_t MaxLights = 4;
-std::array<PointLight*, MaxLights>  pointLights;
+
+
+const uint16_t MaxLights = 8;
+std::vector<PointLight>  pointLights;
+
+std::array<DirLight*, MaxLights>  dirLights;
+
+
+uint32_t dirLightAmount = 0;
+
 
 
 
@@ -98,12 +106,10 @@ void Application::Init()
 
     mesh = new Model("res/models/backpack.obj", material);
 
-    light = new Light;
-    pointLight = new PointLight;
+    pointLights.reserve(7);
 
+        dirLights[0] = new DirLight;
 
-    for (auto& i : pointLights)
-        i = new PointLight;
 
 }
 
@@ -136,32 +142,40 @@ void Application::Update()
 
         //lighting
         material->m_shader->SetVec3f("viewPos", camera->m_Position.x,camera->m_Position.y, camera->m_Position.z);
-                                     
-        //for (auto s : pointLights)
-        //    s->isWorking = true;
 
-        //pointLights[0]->isWorking = false;
-        pointLights[1]->isWorking = true;
-        //pointLights[2]->isWorking = false;
-        //pointLights[3]->isWorking = false;
+        material->m_shader->SetInt("scene.mPointLights", pointLights.size());                                 
+        material->m_shader->SetInt("scene.mDirLights", dirLightAmount);                                 
 
-        for (uint8_t i = 0; i < 4; i++)
+        for (uint32_t i = 0; i < pointLights.size(); i++)
         {
-            if (pointLights[i]->isWorking)
+            if (pointLights[i].isWorking)
             {
-                material->m_shader->SetVec3f(("pointLights[" + std::to_string(i) + "].position"), pointLights[i]->Getlightpos().x, pointLights[i]->Getlightpos().y, pointLights[i]->Getlightpos().z);
-                material->m_shader->SetVec3f(("pointLights[" + std::to_string(i) + "].lightColor"), pointLights[i]->m_LightCol.x, pointLight->m_LightCol.y, pointLight->m_LightCol.z);
-                material->m_shader->SetFloat(("pointLights[" + std::to_string(i) + "].linear"), pointLights[i]->linear);
-                material->m_shader->SetFloat(("pointLights[" + std::to_string(i) + "].quadratic"), pointLights[i]->quadratic);
-                material->m_shader->SetFloat(("pointLights[" + std::to_string(i) + "].intensity"), pointLights[i]->intensity);
+                material->m_shader->SetVec3f(("pointLights[" + std::to_string(i) + "].position"), pointLights[i].Getlightpos().x, pointLights[i].Getlightpos().y, pointLights[i].Getlightpos().z);
+                material->m_shader->SetVec3f(("pointLights[" + std::to_string(i) + "].lightColor"), pointLights[i].m_LightCol.x, pointLights[i].m_LightCol.y, pointLights[i].m_LightCol.z);
+                material->m_shader->SetFloat(("pointLights[" + std::to_string(i) + "].linear"), pointLights[i].linear);
+                material->m_shader->SetFloat(("pointLights[" + std::to_string(i) + "].quadratic"), pointLights[i].quadratic);
+                material->m_shader->SetFloat(("pointLights[" + std::to_string(i) + "].intensity"), pointLights[i].intensity);
             }
             else 
             {
-                material->m_shader->SetVec3f(("pointLights[" + std::to_string(i) + "].lightColor"), 0.0f, 0, 0);
-                material->m_shader->SetVec3f(("pointLights[" + std::to_string(i) + "].position"), 0, 0, 0);
-                material->m_shader->SetFloat(("pointLights[" + std::to_string(i) + "].intensity"), 0.0f);
+                material->m_shader->SetVec3f(("pointLights[" + std::to_string(i) + "].position"), 0,0,0);
+                material->m_shader->SetVec3f(("pointLights[" + std::to_string(i) + "].lightColor"), 0,0,0);
+                material->m_shader->SetFloat(("pointLights[" + std::to_string(i) + "].linear"), 0);
+                material->m_shader->SetFloat(("pointLights[" + std::to_string(i) + "].quadratic"), 0);
+                material->m_shader->SetFloat(("pointLights[" + std::to_string(i) + "].intensity"), 0);
             }
+
         }
+        for (uint32_t i = pointLights.size(); i < 7;i++ )
+        {
+            material->m_shader->SetVec3f(("pointLights[" + std::to_string(i) + "].position"), 0, 0, 0);
+            material->m_shader->SetVec3f(("pointLights[" + std::to_string(i) + "].lightColor"), 0, 0, 0);
+            material->m_shader->SetFloat(("pointLights[" + std::to_string(i) + "].linear"), 0);
+            material->m_shader->SetFloat(("pointLights[" + std::to_string(i) + "].quadratic"), 0);
+            material->m_shader->SetFloat(("pointLights[" + std::to_string(i) + "].intensity"), 0);
+        }
+
+
 
         //material properties
         material->m_shader->SetVec3f("material.ambient", material->ambient.x, material->ambient.y, material->ambient.z);
@@ -172,22 +186,34 @@ void Application::Update()
 
         //ImGui     
 
-        ImGui::Begin("Model Inspector");
-        if(ImGui::TreeNode("Lights"))
-        {
-            ImGui::ColorEdit3("lightColor", (float*)&light->m_LightCol);
-            ImGui::SliderFloat3("light Position", (float*) &pointLights[1]->m_lightPos, -5.0f, 5.0f);
-            ImGui::TreePop();
-        }
-        if (ImGui::TreeNode("test"))
-        {
-            ImGui::SliderFloat("linear", &pointLight->linear, 0.0, 1.0);
-            ImGui::SliderFloat("quadratic", &pointLight->quadratic, .0f, 1.0f);
+        //FLAGS
+        
+        ImGuiWindowFlags window_flags = 0;
+        window_flags =
+            ImGuiWindowFlags_NoTitleBar |
+            ImGuiWindowFlags_NoMove;
+            
 
-            ImGui::TreePop();
+        ImGuiStyle& style = ImGui::GetStyle();
+        style.WindowRounding = 5;
+        
+        ImGui::Begin("Model Inspector",0, window_flags);
+        ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
+        if (ImGui::BeginTabBar("MyTabBar", tab_bar_flags))
+        {
+            if (ImGui::BeginTabItem("Avocado"))
+            {
+
+                ImGui::EndTabItem();
+            }
+
+            ImGui::EndTabBar();
         }
-        ImGui::SetNextItemOpen(true);
-        if (ImGui::TreeNode("Model Loader"))
+        ImGui::Separator();
+
+        editor::RenderLightButtons(pointLights);
+
+        if (ImGui::CollapsingHeader("ModelLoader", ImGuiStyleVar_PopupRounding))
         {
 
             ImGui::Spacing();
@@ -200,7 +226,6 @@ void Application::Update()
             if (useTexAlbedo)
             {
                 if (ImGui::InputText("albedo texture path", albedoTexPath, sizeof(char) * 100));
-
             }
             if (useTexSpecular)
             {
@@ -223,7 +248,8 @@ void Application::Update()
                 }
                 else
                 {
-                    albedoTexture = new Texture("res/textures/white.png");
+                    unsigned char darkGray[4] = { 36,36,36,255 };
+                    albedoTexture = new Texture(darkGray, 1, 1);
                 }
                 if (useTexSpecular)
                 {
@@ -239,9 +265,9 @@ void Application::Update()
 
                 mesh = new Model(modelPath, material);
 
-                sl::EndBenchmark("modelLoader");
+                std::cout << "model loaded in " << sl::EndBenchmark("modelLoader") << " seconds\n";
             }
-            ImGui::TreePop();
+
 
             if (ImGui::TreeNode("Camera"))
             {
@@ -250,8 +276,6 @@ void Application::Update()
             }
 
         }
-        
-               
         ImGui::End();
 
         ImGui::Render();
@@ -274,12 +298,14 @@ void Application::Exit()
     delete(camera);
     delete(renderer);
     delete(mesh);
-    delete(light);
     delete(material);
     delete(shader);
     delete(albedoTexture);
     delete(specularTexture);
+    editor::m_LightPointer = nullptr;
 
+    for (auto index : dirLights)
+        delete index;
 }
 
 bool Application::IsRunning()

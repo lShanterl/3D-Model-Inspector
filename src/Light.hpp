@@ -6,35 +6,22 @@
 #include "vendor/glm/glm.hpp"
 #include "vendor/glm/gtc/matrix_transform.hpp"
 
-class Light
+enum LightType
 {
-	//vec3 lightDir = normalize(lightDir - FragPos);
-public:
-	Light();
-	~Light();
-
-	glm::vec3 m_lightPos = glm::vec3(-.250f, 0.310f, 1.0f);
-
-	glm::vec3 m_LightCol = glm::vec3(1.0f,1.0f,1.0f);
-
-	float ambientStrength = 0.1;
-	glm::vec3 Getlightpos();
-
-    
-private:
-	
+	e_dirLight,
+	e_pointLight,
+	e_spotLight,
+	e_none
 };
-
 
 class DirLight
 {
-	//vec3 lightDir = normalize(-lightDir);
-	//uniform vec3 position; no longer necessary when using directional lights.
 public:
 
 	glm::vec3 m_Direction = { -0.2f, -1.0f, -0.3f };
 	float ambient;
-
+	LightType m_type = e_dirLight;
+	glm::vec3 m_LightCol = glm::vec3(1.0f, 1.0f, 1.0f);
 
 private:
 
@@ -50,12 +37,13 @@ public:
 
 	float intensity = 1;
 
-	bool isWorking = false;
-
+	bool isWorking = true;
 	float ambientStrength = 0.1;
 
 	float linear = 0.027f;
 	float quadratic = 0.028f;
+
+	LightType m_type = e_pointLight;
 
 	glm::vec3 Getlightpos();
 };
