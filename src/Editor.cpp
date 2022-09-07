@@ -9,33 +9,7 @@ void editor::SetEditor(void* light, LightType type, int index)
 	index =m_index;
 }
 
-void editor::Renderer()
-{
-	if (!m_LightPointer)
-		return;
-
-	if (m_LightType == e_pointLight)
-	{
-		PointLight* light = reinterpret_cast<PointLight*>(m_LightPointer);
-		RenderPoint(light);
-	}
-	else if(m_LightType == e_dirLight)
-	{
-		DirLight* light = reinterpret_cast<DirLight*>(m_LightPointer);
-		RenderDir(light);
-	}
-	else if(m_LightType == e_spotLight)
-	{
-		SpotLight* light = reinterpret_cast<SpotLight*>(m_LightPointer);
-		RenderSpot(light);
-	}
-	else
-	{
-
-	}
-}
-
-void editor::RenderLightButtons(std::vector<PointLight>& pointLights)
+void editor::RenderLightButtons(std::vector<PointLight>& pointLights, std::vector<DirLight>& dirLights)
 {
 	
 	if (ImGui::CollapsingHeader("Lights", ImGuiStyleVar_PopupRounding))
@@ -112,30 +86,5 @@ void editor::RenderLightButtons(std::vector<PointLight>& pointLights)
 
 }
 
-void editor::RenderDir(DirLight* light)
-{
-	ImGui::SliderFloat3("direction", (float*)&light->m_Direction[0], -5.0f, 5.0f);
-	ImGui::ColorEdit3("light color", (float*)&light->m_LightCol[0]);
-}
-
-void editor::RenderPoint(PointLight* light)
-{
-	ImGui::SliderFloat3("position", (float*)&light->m_lightPos[0], -5.0f, 5.0f);
-	ImGui::ColorEdit3("light color", (float*)&light->m_LightCol[0]);
-	if(ImGui::Button("delete"))
-	{		
-		
-		m_LightPointer = nullptr;
-		m_LightType = e_none;
-		
-		
-	}
-	
-}
-
-void editor::RenderSpot(SpotLight* light)
-{
-
-}
 
 

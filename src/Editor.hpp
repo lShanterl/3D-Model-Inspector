@@ -21,15 +21,7 @@ namespace editor
 
 
 	void SetEditor(void* light, LightType type,int index);
-
-	void Renderer();
-
-	void RenderLightButtons(std::vector<PointLight>& pointLights);
-
-	void RenderDir(DirLight* light);
-	void RenderPoint(PointLight* light);
-	void RenderSpot(SpotLight* light);
-
+	void RenderLightButtons(std::vector<PointLight>& pointLights, std::vector<DirLight>& dirLights);
 }
 
 #endif // !EDITOR_HPP

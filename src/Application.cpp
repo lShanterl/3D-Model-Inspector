@@ -9,9 +9,7 @@ Material* material;
 Texture* albedoTexture;
 Texture* specularTexture;
 Shader* shader;
-DirLight* dirLight;
 
- 
 constexpr int width = 1920, height = 1080;
 
 //mvp
@@ -29,18 +27,9 @@ bool bIsRunning = true;
 bool useTexAlbedo = false;
 bool useTexSpecular = false;
 
-
-
-const uint16_t MaxLights = 8;
 std::vector<PointLight>  pointLights;
 
-std::array<DirLight*, MaxLights>  dirLights;
-
-
-uint32_t dirLightAmount = 0;
-
-
-
+std::vector<DirLight> dirLights;
 
 void Application::framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -108,7 +97,7 @@ void Application::Init()
 
     pointLights.reserve(7);
 
-        dirLights[0] = new DirLight;
+    dirLights.reserve(3);
 
 
 }
@@ -144,7 +133,7 @@ void Application::Update()
         material->m_shader->SetVec3f("viewPos", camera->m_Position.x,camera->m_Position.y, camera->m_Position.z);
 
         material->m_shader->SetInt("scene.mPointLights", pointLights.size());                                 
-        material->m_shader->SetInt("scene.mDirLights", dirLightAmount);                                 
+        material->m_shader->SetInt("scene.mDirLights", dirLights.size());                                 
 
         for (uint32_t i = 0; i < pointLights.size(); i++)
         {
@@ -166,7 +155,7 @@ void Application::Update()
             }
 
         }
-        for (uint32_t i = pointLights.size(); i < 7;i++ )
+        for (uint32_t i = pointLights.size(); i < 25;i++ )
         {
             material->m_shader->SetVec3f(("pointLights[" + std::to_string(i) + "].position"), 0, 0, 0);
             material->m_shader->SetVec3f(("pointLights[" + std::to_string(i) + "].lightColor"), 0, 0, 0);
@@ -201,7 +190,7 @@ void Application::Update()
         ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
         if (ImGui::BeginTabBar("MyTabBar", tab_bar_flags))
         {
-            if (ImGui::BeginTabItem("Avocado"))
+            if (ImGui::BeginTabItem("Scene"))
             {
 
                 ImGui::EndTabItem();
@@ -211,7 +200,7 @@ void Application::Update()
         }
         ImGui::Separator();
 
-        editor::RenderLightButtons(pointLights);
+        editor::RenderLightButtons(pointLights, dirLights);
 
         if (ImGui::CollapsingHeader("ModelLoader", ImGuiStyleVar_PopupRounding))
         {
@@ -304,8 +293,6 @@ void Application::Exit()
     delete(specularTexture);
     editor::m_LightPointer = nullptr;
 
-    for (auto index : dirLights)
-        delete index;
 }
 
 bool Application::IsRunning()
