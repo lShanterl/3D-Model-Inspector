@@ -223,12 +223,13 @@ void Application::Update()
             }
             if (ImGui::Button("Load Model and Texture"))
             {
+                sl::BeginBenchmark("modelLoader");
                 delete(mesh);
                 delete(material);
                 delete(albedoTexture);
                 delete(specularTexture);
                 
-                sl::BeginBenchmark("modelLoader");
+                
                 
 
                 if (useTexAlbedo)
@@ -237,8 +238,8 @@ void Application::Update()
                 }
                 else
                 {
-                    unsigned char darkGray[4] = { 36,36,36,255 };
-                    albedoTexture = new Texture(darkGray, 1, 1);
+                    unsigned char white[4] = { 255,255,255,255 };
+                    albedoTexture = new Texture(white, 1, 1);
                 }
                 if (useTexSpecular)
                 {
