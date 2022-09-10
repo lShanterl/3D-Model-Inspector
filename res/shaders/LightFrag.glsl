@@ -45,6 +45,7 @@ struct Scene
 };
 
 #define NR_POINT_LIGHTS 8  
+#define NR_DIR_LIGHTS 4
 
 
 in vec3 FragPos;
@@ -54,7 +55,7 @@ in vec2 v_TexCoords;
 uniform sampler2D u_Texture;
 
 uniform vec3 viewPos;
-uniform DirLight dirLight;
+uniform DirLight dirLights[NR_DIR_LIGHTS];
 uniform PointLight pointLights[NR_POINT_LIGHTS];
 uniform SpotLight spotLight;
 uniform Material material;
@@ -75,7 +76,8 @@ void main()
 
     vec3 result = ambient;
     // phase 1: Directional lighting
-        result += CalcDirLight(dirLight, norm, viewDir);
+    for(int i = 0; i <= NR_DIR_LIGHTS; i++)
+        result += CalcDirLight(dirLights[i], norm, viewDir);
     // phase 2: Point lights
     for(int i = 0; i <= scene.mPointLights; i++)
     {
@@ -101,7 +103,7 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)
     // combine results
     vec3 diffuse  = light.lightColor  * diff * texture(material.diffuse, v_TexCoords).rgb;
     vec3 specular = light.lightColor * spec * texture(material.specular, v_TexCoords).rgb;
-    return (diffuse + specular) * 0;
+    return (diffuse + specular);
 }  
 
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
@@ -156,7 +158,7 @@ vec3 CalcSpotLights(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
    diffuse  *= attenuation;
    specular *= attenuation;
    
-   vec3 result = (diffuse + specular) * 0;
+   vec3 result = (diffuse + specular);
 
    return result;
 }

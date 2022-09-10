@@ -19,9 +19,10 @@ class DirLight
 public:
 
 	glm::vec3 m_Direction = { -0.2f, -1.0f, -0.3f };
-	float ambient;
 	LightType m_type = e_dirLight;
 	glm::vec3 m_LightCol = glm::vec3(1.0f, 1.0f, 1.0f);
+	bool isWorking = true;
+
 
 private:
 

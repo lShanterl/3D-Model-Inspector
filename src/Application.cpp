@@ -164,6 +164,27 @@ void Application::Update()
             material->m_shader->SetFloat(("pointLights[" + std::to_string(i) + "].intensity"), 0);
         }
 
+        for (uint32_t i = 0; i < dirLights.size(); i++)
+        {
+            if (dirLights[i].isWorking)
+            {
+                material->m_shader->SetVec3f("dirLights[" + std::to_string(i) + "].direction", dirLights[i].m_Direction.x, dirLights[i].m_Direction.y, dirLights[i].m_Direction.z);
+                material->m_shader->SetVec3f("dirLights[" + std::to_string(i) + "].lightColor", dirLights[i].m_LightCol.x, dirLights[i].m_LightCol.y, dirLights[i].m_LightCol.z);
+            }
+            else
+            {
+                material->m_shader->SetVec3f("dirLights[" + std::to_string(i) + "].direction", 0,0,0);
+                material->m_shader->SetVec3f("dirLights[" + std::to_string(i) + "].lightColor", 0,0,0);
+            }
+
+        }
+        for (uint32_t i = dirLights.size(); i < 25; i++)
+        {
+             material->m_shader->SetVec3f("dirLights[" + std::to_string(i) + "].direction", 0,0,0);
+             material->m_shader->SetVec3f("dirLights[" + std::to_string(i) + "].lightColor", 0,0,0);
+        }
+       
+
 
 
         //material properties
@@ -179,13 +200,15 @@ void Application::Update()
         
         ImGuiWindowFlags window_flags = 0;
         window_flags =
-            ImGuiWindowFlags_NoTitleBar |
-            ImGuiWindowFlags_NoMove;
+            ImGuiWindowFlags_NoTitleBar;
+            //ImGuiWindowFlags_NoMove;
             
 
         ImGuiStyle& style = ImGui::GetStyle();
         style.WindowRounding = 5;
+        style.FrameRounding = 5;
         
+        ImGui::BeginMainMenuBar();
         ImGui::Begin("Model Inspector",0, window_flags);
         ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
         if (ImGui::BeginTabBar("MyTabBar", tab_bar_flags))
@@ -267,6 +290,8 @@ void Application::Update()
 
         }
         ImGui::End();
+
+        ImGui::EndMainMenuBar();
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
