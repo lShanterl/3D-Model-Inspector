@@ -53,8 +53,21 @@ class SpotLight
 {
 public:
 
+	glm::vec3 m_lightPos = glm::vec3(-.250f, 0.310f, 1.0f);
+	glm::vec3 m_Direction = { -0.2f, -1.0f, -0.3f };
 
+	float cutOff = 23.5f;
+	float outerCutOff = 27.5f;
 
+	float linear = 0.027f;
+	float quadratic = 0.028f;
+	//bool cameraMimic = false;
+
+	glm::vec3 m_LightCol = glm::vec3(1.0f, 1.0f, 1.0f);
+
+	bool isWorking = true;
+
+	LightType m_type = e_spotLight;
 };
 
 #endif

@@ -31,6 +31,8 @@ std::vector<PointLight>  pointLights;
 
 std::vector<DirLight> dirLights;
 
+std::vector<SpotLight> spotLights;
+
 void Application::framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
@@ -99,6 +101,8 @@ void Application::Init()
 
     dirLights.reserve(3);
 
+    spotLights.reserve(2);
+
 
 }
 
@@ -123,74 +127,7 @@ void Application::Update()
 
         renderer->Clear();
 
-        //mvp
-        material->m_shader->SetMatrix4f("model", model);
-        material->m_shader->SetMatrix4f("view", camera->GetView());
-        material->m_shader->SetMatrix4f("projection", proj);
-        material->m_shader->SetMatrix4f("u_MVP", mvp);
-
-        //lighting
-        material->m_shader->SetVec3f("viewPos", camera->m_Position.x,camera->m_Position.y, camera->m_Position.z);
-
-        material->m_shader->SetInt("scene.mPointLights", pointLights.size());                                 
-        material->m_shader->SetInt("scene.mDirLights", dirLights.size());                                 
-
-        for (uint32_t i = 0; i < pointLights.size(); i++)
-        {
-            if (pointLights[i].isWorking)
-            {
-                material->m_shader->SetVec3f(("pointLights[" + std::to_string(i) + "].position"), pointLights[i].Getlightpos().x, pointLights[i].Getlightpos().y, pointLights[i].Getlightpos().z);
-                material->m_shader->SetVec3f(("pointLights[" + std::to_string(i) + "].lightColor"), pointLights[i].m_LightCol.x, pointLights[i].m_LightCol.y, pointLights[i].m_LightCol.z);
-                material->m_shader->SetFloat(("pointLights[" + std::to_string(i) + "].linear"), pointLights[i].linear);
-                material->m_shader->SetFloat(("pointLights[" + std::to_string(i) + "].quadratic"), pointLights[i].quadratic);
-                material->m_shader->SetFloat(("pointLights[" + std::to_string(i) + "].intensity"), pointLights[i].intensity);
-            }
-            else 
-            {
-                material->m_shader->SetVec3f(("pointLights[" + std::to_string(i) + "].position"), 0,0,0);
-                material->m_shader->SetVec3f(("pointLights[" + std::to_string(i) + "].lightColor"), 0,0,0);
-                material->m_shader->SetFloat(("pointLights[" + std::to_string(i) + "].linear"), 0);
-                material->m_shader->SetFloat(("pointLights[" + std::to_string(i) + "].quadratic"), 0);
-                material->m_shader->SetFloat(("pointLights[" + std::to_string(i) + "].intensity"), 0);
-            }
-
-        }
-        for (uint32_t i = pointLights.size(); i < 25;i++ )
-        {
-            material->m_shader->SetVec3f(("pointLights[" + std::to_string(i) + "].position"), 0, 0, 0);
-            material->m_shader->SetVec3f(("pointLights[" + std::to_string(i) + "].lightColor"), 0, 0, 0);
-            material->m_shader->SetFloat(("pointLights[" + std::to_string(i) + "].linear"), 0);
-            material->m_shader->SetFloat(("pointLights[" + std::to_string(i) + "].quadratic"), 0);
-            material->m_shader->SetFloat(("pointLights[" + std::to_string(i) + "].intensity"), 0);
-        }
-
-        for (uint32_t i = 0; i < dirLights.size(); i++)
-        {
-            if (dirLights[i].isWorking)
-            {
-                material->m_shader->SetVec3f("dirLights[" + std::to_string(i) + "].direction", dirLights[i].m_Direction.x, dirLights[i].m_Direction.y, dirLights[i].m_Direction.z);
-                material->m_shader->SetVec3f("dirLights[" + std::to_string(i) + "].lightColor", dirLights[i].m_LightCol.x, dirLights[i].m_LightCol.y, dirLights[i].m_LightCol.z);
-            }
-            else
-            {
-                material->m_shader->SetVec3f("dirLights[" + std::to_string(i) + "].direction", 0,0,0);
-                material->m_shader->SetVec3f("dirLights[" + std::to_string(i) + "].lightColor", 0,0,0);
-            }
-
-        }
-        for (uint32_t i = dirLights.size(); i < 25; i++)
-        {
-             material->m_shader->SetVec3f("dirLights[" + std::to_string(i) + "].direction", 0,0,0);
-             material->m_shader->SetVec3f("dirLights[" + std::to_string(i) + "].lightColor", 0,0,0);
-        }
-       
-
-
-
-        //material properties
-        material->m_shader->SetVec3f("material.ambient", material->ambient.x, material->ambient.y, material->ambient.z);
-        material->m_shader->SetFloat("material.shininess", material->shininess);
-
+        Application::SetUniforms();
 
         GLCall(renderer->Draw(*mesh->m_vao, *mesh->m_ib, *material->m_shader));
 
@@ -223,7 +160,7 @@ void Application::Update()
         }
         ImGui::Separator();
 
-        editor::RenderLightButtons(pointLights, dirLights);
+        editor::RenderLightButtons(pointLights, dirLights, spotLights, camera);
 
         if (ImGui::CollapsingHeader("ModelLoader", ImGuiStyleVar_PopupRounding))
         {
@@ -319,6 +256,121 @@ void Application::Exit()
     delete(specularTexture);
     editor::m_LightPointer = nullptr;
 
+}
+
+void Application::SetUniforms()
+{
+    //mvp
+    material->m_shader->SetMatrix4f("model", model);
+    material->m_shader->SetMatrix4f("view", camera->GetView());
+    material->m_shader->SetMatrix4f("projection", proj);
+    material->m_shader->SetMatrix4f("u_MVP", mvp);
+
+    //lighting
+    material->m_shader->SetVec3f("viewPos", camera->m_Position.x, camera->m_Position.y, camera->m_Position.z);
+
+    material->m_shader->SetInt("scene.mPointLights", pointLights.size());
+    material->m_shader->SetInt("scene.mDirLights", dirLights.size());
+
+    for (uint32_t i = 0; i < pointLights.size(); i++)
+    {
+        if (pointLights[i].isWorking)
+        {
+            material->m_shader->SetVec3f(("pointLights[" + std::to_string(i) + "].position"), pointLights[i].Getlightpos().x, pointLights[i].Getlightpos().y, pointLights[i].Getlightpos().z);
+            material->m_shader->SetVec3f(("pointLights[" + std::to_string(i) + "].lightColor"), pointLights[i].m_LightCol.x, pointLights[i].m_LightCol.y, pointLights[i].m_LightCol.z);
+            material->m_shader->SetFloat(("pointLights[" + std::to_string(i) + "].linear"), pointLights[i].linear);
+            material->m_shader->SetFloat(("pointLights[" + std::to_string(i) + "].quadratic"), pointLights[i].quadratic);
+            material->m_shader->SetFloat(("pointLights[" + std::to_string(i) + "].intensity"), pointLights[i].intensity);
+        }
+        else
+        {
+            material->m_shader->SetVec3f(("pointLights[" + std::to_string(i) + "].position"), 0, 0, 0);
+            material->m_shader->SetVec3f(("pointLights[" + std::to_string(i) + "].lightColor"), 0, 0, 0);
+            material->m_shader->SetFloat(("pointLights[" + std::to_string(i) + "].linear"), 0);
+            material->m_shader->SetFloat(("pointLights[" + std::to_string(i) + "].quadratic"), 0);
+            material->m_shader->SetFloat(("pointLights[" + std::to_string(i) + "].intensity"), 0);
+        }
+
+    }
+    for (uint32_t i = pointLights.size(); i < 25; i++)
+    {
+        material->m_shader->SetVec3f(("pointLights[" + std::to_string(i) + "].position"), 0, 0, 0);
+        material->m_shader->SetVec3f(("pointLights[" + std::to_string(i) + "].lightColor"), 0, 0, 0);
+        material->m_shader->SetFloat(("pointLights[" + std::to_string(i) + "].linear"), 0);
+        material->m_shader->SetFloat(("pointLights[" + std::to_string(i) + "].quadratic"), 0);
+        material->m_shader->SetFloat(("pointLights[" + std::to_string(i) + "].intensity"), 0);
+    }
+
+    for (uint32_t i = 0; i < dirLights.size(); i++)
+    {
+        if (dirLights[i].isWorking)
+        {
+            material->m_shader->SetVec3f("dirLights[" + std::to_string(i) + "].direction", dirLights[i].m_Direction.x, dirLights[i].m_Direction.y, dirLights[i].m_Direction.z);
+            material->m_shader->SetVec3f("dirLights[" + std::to_string(i) + "].lightColor", dirLights[i].m_LightCol.x, dirLights[i].m_LightCol.y, dirLights[i].m_LightCol.z);
+        }
+        else
+        {
+            material->m_shader->SetVec3f("dirLights[" + std::to_string(i) + "].direction", 0, 0, 0);
+            material->m_shader->SetVec3f("dirLights[" + std::to_string(i) + "].lightColor", 0, 0, 0);
+        }
+
+    }
+    for (uint32_t i = dirLights.size(); i < 25; i++)
+    {
+        material->m_shader->SetVec3f("dirLights[" + std::to_string(i) + "].direction", 0, 0, 0);
+        material->m_shader->SetVec3f("dirLights[" + std::to_string(i) + "].lightColor", 0, 0, 0);
+    }
+
+
+
+
+    for (uint32_t i = 0; i < spotLights.size(); i++)
+    {
+        if (spotLights[i].isWorking)
+        {
+            material->m_shader->SetVec3f("spotLights[" + std::to_string(i) + "].direction", spotLights[i].m_Direction.x, spotLights[i].m_Direction.y, spotLights[i].m_Direction.z);
+            material->m_shader->SetVec3f("spotLights[" + std::to_string(i) + "].lightColor", spotLights[i].m_LightCol.x, spotLights[i].m_LightCol.y, spotLights[i].m_LightCol.z);
+            material->m_shader->SetVec3f(("spotLights[" + std::to_string(i) + "].position"),spotLights[i].m_lightPos.x, spotLights[i].m_lightPos.y, spotLights[i].m_lightPos.z);
+
+            //material->m_shader->SetVec3f("spotLights[" + std::to_string(i) + "].direction", camera->cameraFront.x, camera->cameraFront.y, camera->cameraFront.z);
+            //material->m_shader->SetVec3f(("spotLights[" + std::to_string(i) + "].position"), camera->m_Position.x, camera->m_Position.y, camera->m_Position.z);
+
+            material->m_shader->SetFloat(("spotLights[" + std::to_string(i) + "].cutOff"), glm::cos(glm::radians(spotLights[i].cutOff)));
+            material->m_shader->SetFloat(("spotLights[" + std::to_string(i) + "].outerCutOff"), glm::cos(glm::radians(spotLights[i].outerCutOff)));
+
+            material->m_shader->SetFloat(("spotLights[" + std::to_string(i) + "].linear"), spotLights[i].linear);
+            material->m_shader->SetFloat(("spotLights[" + std::to_string(i) + "].quadratic"),spotLights[i].quadratic);
+        }
+        else
+        {
+            material->m_shader->SetVec3f("spotLights[" + std::to_string(i) + "].direction", 0, 0, 0);
+            material->m_shader->SetVec3f("spotLights[" + std::to_string(i) + "].lightColor", 0, 0, 0);
+            material->m_shader->SetFloat(("spotLights[" + std::to_string(i) + "].cutOff"), 0);
+            material->m_shader->SetFloat(("spotLights[" + std::to_string(i) + "].outerCutOff"), 0);
+            material->m_shader->SetVec3f(("spotLights[" + std::to_string(i) + "].position"), 0,0,0);
+            material->m_shader->SetFloat(("spotLights[" + std::to_string(i) + "].linear"), 0);
+            material->m_shader->SetFloat(("spotLights[" + std::to_string(i) + "].quadratic"), 0);
+
+        }
+
+    }
+    for (uint32_t i = spotLights.size(); i < 10; i++)
+    {
+        material->m_shader->SetVec3f("spotLights[" + std::to_string(i) + "].direction", 0, 0, 0);
+        material->m_shader->SetVec3f("spotLights[" + std::to_string(i) + "].lightColor", 0, 0, 0);
+        material->m_shader->SetFloat(("spotLights[" + std::to_string(i) + "].cutOff"), 0);
+        material->m_shader->SetFloat(("spotLights[" + std::to_string(i) + "].outerCutOff"), 0);
+        material->m_shader->SetVec3f(("spotLights[" + std::to_string(i) + "].position"), 0, 0, 0);
+        material->m_shader->SetFloat(("spotLights[" + std::to_string(i) + "].linear"), 0);
+        material->m_shader->SetFloat(("spotLights[" + std::to_string(i) + "].quadratic"), 0);
+    }
+
+
+
+
+    //material properties
+    material->m_shader->SetVec3f("material.ambient", material->ambient.x, material->ambient.y, material->ambient.z);
+    material->m_shader->SetFloat("material.shininess", material->shininess);
 }
 
 bool Application::IsRunning()

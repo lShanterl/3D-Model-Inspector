@@ -46,9 +46,10 @@ struct Scene
 
 #define NR_POINT_LIGHTS 8  
 #define NR_DIR_LIGHTS 4
+#define NR_SPOT_LIGHTS 4
 
 
-in vec3 FragPos;
+in vec3 fragPos;
 in vec3 Normal;
 in vec2 v_TexCoords;
 
@@ -57,7 +58,7 @@ uniform sampler2D u_Texture;
 uniform vec3 viewPos;
 uniform DirLight dirLights[NR_DIR_LIGHTS];
 uniform PointLight pointLights[NR_POINT_LIGHTS];
-uniform SpotLight spotLight;
+uniform SpotLight spotLights[NR_SPOT_LIGHTS];
 uniform Material material;
 uniform Scene scene;
 
@@ -72,19 +73,22 @@ void main()
     vec3 ambient = material.ambient * texture(material.diffuse, v_TexCoords).rgb;
 
     vec3 norm = normalize(Normal);
-    vec3 viewDir = normalize(viewPos - FragPos);
+    vec3 viewDir = normalize(viewPos - fragPos);
 
     vec3 result = ambient;
     // phase 1: Directional lighting
     for(int i = 0; i <= NR_DIR_LIGHTS; i++)
         result += CalcDirLight(dirLights[i], norm, viewDir);
     // phase 2: Point lights
-    for(int i = 0; i <= scene.mPointLights; i++)
+    for(int i = 0; i <= NR_POINT_LIGHTS; i++)
     {
-        result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);    
+        result += CalcPointLight(pointLights[i], norm, fragPos, viewDir);    
     }
     // phase 3: Spot light
-        result += CalcSpotLights(spotLight, norm, FragPos, viewDir);    
+    for(int i = 0; i <= NR_SPOT_LIGHTS; i++)
+    {
+      result += CalcSpotLights(spotLights[i], norm, fragPos, viewDir);    
+    }
 
         
 
@@ -129,6 +133,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 vec3 CalcSpotLights(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 {
 
+
     //diffuse
     vec3 norm = normalize(Normal);
     vec3 lightDir = normalize(light.position - fragPos);
@@ -144,7 +149,7 @@ vec3 CalcSpotLights(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     float theta = dot(lightDir, normalize(-light.direction));
 
    float epsilon   = light.cutOff - light.outerCutOff;
-   //float intensity = clamp((theta - outerCutOff) / epsilon, 0.0, 1.0);
+   //float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
 
    float intensity = smoothstep(0.0, 1.0, (theta - light.outerCutOff) / epsilon);
    
@@ -159,6 +164,17 @@ vec3 CalcSpotLights(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
    specular *= attenuation;
    
    vec3 result = (diffuse + specular);
+
+   //if(intensity > 0.5)
+   //{
+   //return vec3(1,0,0);
+   //}
+   //else if(intensity > 0){
+   //return vec3(0,0,1);
+   //}else
+   //{
+   //return vec3(0,1,0);
+   //}
 
    return result;
 }

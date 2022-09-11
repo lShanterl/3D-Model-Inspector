@@ -44,6 +44,7 @@ namespace Application
 	void Update();
 	void Exit();
 	bool IsRunning();
+	void SetUniforms();
 	
 }
 
