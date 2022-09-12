@@ -135,13 +135,12 @@ vec3 CalcSpotLights(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 
 
     //diffuse
-    vec3 norm = normalize(Normal);
     vec3 lightDir = normalize(light.position - fragPos);
-    float diff = max(dot(norm, lightDir), 0.0);
+    float diff = max(dot(normal, lightDir), 0.0);
     vec3 diffuse = diff * light.lightColor * texture(material.diffuse, v_TexCoords).rgb;
 
     //specular
-    vec3 reflectDir = reflect(-lightDir, norm);  
+    vec3 reflectDir = reflect(-lightDir, normal);  
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
     vec3 specular = light.lightColor * spec * texture(material.specular, v_TexCoords).rgb;
 

@@ -101,9 +101,15 @@ void Application::Init()
 
     pointLights.reserve(7);
 
-    dirLights.reserve(3);
+    dirLights.reserve(4);
 
-    spotLights.reserve(2);
+    spotLights.reserve(3);
+
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.WindowRounding = 5;
+    style.FrameRounding = 5;
+    //style.Colors[ImGuiCol_Header] = ImVec4(0.83, 0.5, 0.25, 1);
+    
 
 
 }
@@ -150,12 +156,7 @@ void Application::Update()
         window_flags =
             ImGuiWindowFlags_NoTitleBar;
             //ImGuiWindowFlags_NoMove;
-            
-
-        ImGuiStyle& style = ImGui::GetStyle();
-        style.WindowRounding = 5;
-        style.FrameRounding = 5;
-        
+                   
         ImGui::BeginMainMenuBar();
         ImGui::Begin("Model Inspector",0, window_flags);
         ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
@@ -180,7 +181,6 @@ void Application::Update()
 
             ImGui::Checkbox("Use Albedo Texture", &useTexAlbedo);
             ImGui::Checkbox("Use Specular Texture", &useTexSpecular);
-
 
             ImGui::InputText("model path", modelPath, sizeof(char) * 65);
             if (useTexAlbedo)
@@ -268,8 +268,8 @@ void Application::Exit()
 
 void Application::SetUniforms()
 {
-    float linear = 0.027f;
-    float quadratic = 0.028f;
+    const float linear = 0.027f;
+    const float quadratic = 0.028f;
     //mvp
     material->m_shader->SetMatrix4f("model", model);
     material->m_shader->SetMatrix4f("view", camera->GetView());
