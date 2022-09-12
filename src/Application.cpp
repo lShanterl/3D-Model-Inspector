@@ -18,6 +18,8 @@ glm::mat4 model = glm::mat4(1.0f);
 glm::mat4 proj;
 glm::mat4 mvp;
 
+//double lastTime = glfwGetTime();
+//int nbFrames = 0;
 
 char modelPath[100] = "";
 char albedoTexPath[100] = "";
@@ -110,6 +112,15 @@ void Application::Update()
 {
     while (!glfwWindowShouldClose(window))
     {
+        // Measure speed
+       //double currentTime = glfwGetTime();
+       //nbFrames++;
+       //if (currentTime - lastTime >= 1.0) { // If last prinf() was more than 1 sec ago
+       //    // printf and reset timer
+       //    printf("%f ms/frame\n", 1000.0 / double(nbFrames));
+       //    nbFrames = 0;
+       //    lastTime += 1.0;
+       //}
         /* Render here */
         int width, height;
         glfwGetFramebufferSize(window, &width, &height);
@@ -171,14 +182,14 @@ void Application::Update()
             ImGui::Checkbox("Use Specular Texture", &useTexSpecular);
 
 
-            ImGui::InputText("model path", modelPath, sizeof(char) * 100);
+            ImGui::InputText("model path", modelPath, sizeof(char) * 65);
             if (useTexAlbedo)
             {
-                if (ImGui::InputText("albedo texture path", albedoTexPath, sizeof(char) * 100));
+                if (ImGui::InputText("albedo texture path", albedoTexPath, sizeof(char) * 65));
             }
             if (useTexSpecular)
             {
-                if (ImGui::InputText("specular texture path", specularTexPath, sizeof(char) * 100));
+                if (ImGui::InputText("specular texture path", specularTexPath, sizeof(char) * 65));
 
             }
             if (ImGui::Button("Load Model and Texture"))
@@ -188,10 +199,7 @@ void Application::Update()
                 delete(material);
                 delete(albedoTexture);
                 delete(specularTexture);
-                
-                
-                
-
+                           
                 if (useTexAlbedo)
                 {                   
                     albedoTexture = new Texture(albedoTexPath);
@@ -260,6 +268,8 @@ void Application::Exit()
 
 void Application::SetUniforms()
 {
+    float linear = 0.027f;
+    float quadratic = 0.028f;
     //mvp
     material->m_shader->SetMatrix4f("model", model);
     material->m_shader->SetMatrix4f("view", camera->GetView());
@@ -274,12 +284,13 @@ void Application::SetUniforms()
 
     for (uint32_t i = 0; i < pointLights.size(); i++)
     {
+
         if (pointLights[i].isWorking)
         {
-            material->m_shader->SetVec3f(("pointLights[" + std::to_string(i) + "].position"), pointLights[i].Getlightpos().x, pointLights[i].Getlightpos().y, pointLights[i].Getlightpos().z);
+            material->m_shader->SetVec3f(("pointLights[" + std::to_string(i) + "].position"), pointLights[i].m_lightPos.x, pointLights[i].m_lightPos.y, pointLights[i].m_lightPos.z);
             material->m_shader->SetVec3f(("pointLights[" + std::to_string(i) + "].lightColor"), pointLights[i].m_LightCol.x, pointLights[i].m_LightCol.y, pointLights[i].m_LightCol.z);
-            material->m_shader->SetFloat(("pointLights[" + std::to_string(i) + "].linear"), pointLights[i].linear);
-            material->m_shader->SetFloat(("pointLights[" + std::to_string(i) + "].quadratic"), pointLights[i].quadratic);
+            material->m_shader->SetFloat(("pointLights[" + std::to_string(i) + "].linear"), linear);
+            material->m_shader->SetFloat(("pointLights[" + std::to_string(i) + "].quadratic"), quadratic);
             material->m_shader->SetFloat(("pointLights[" + std::to_string(i) + "].intensity"), pointLights[i].intensity);
         }
         else
@@ -321,9 +332,6 @@ void Application::SetUniforms()
         material->m_shader->SetVec3f("dirLights[" + std::to_string(i) + "].lightColor", 0, 0, 0);
     }
 
-
-
-
     for (uint32_t i = 0; i < spotLights.size(); i++)
     {
         if (spotLights[i].isWorking)
@@ -338,8 +346,8 @@ void Application::SetUniforms()
             material->m_shader->SetFloat(("spotLights[" + std::to_string(i) + "].cutOff"), glm::cos(glm::radians(spotLights[i].cutOff)));
             material->m_shader->SetFloat(("spotLights[" + std::to_string(i) + "].outerCutOff"), glm::cos(glm::radians(spotLights[i].outerCutOff)));
 
-            material->m_shader->SetFloat(("spotLights[" + std::to_string(i) + "].linear"), spotLights[i].linear);
-            material->m_shader->SetFloat(("spotLights[" + std::to_string(i) + "].quadratic"),spotLights[i].quadratic);
+            material->m_shader->SetFloat(("spotLights[" + std::to_string(i) + "].linear"), linear);
+            material->m_shader->SetFloat(("spotLights[" + std::to_string(i) + "].quadratic"),quadratic);
         }
         else
         {
@@ -364,9 +372,6 @@ void Application::SetUniforms()
         material->m_shader->SetFloat(("spotLights[" + std::to_string(i) + "].linear"), 0);
         material->m_shader->SetFloat(("spotLights[" + std::to_string(i) + "].quadratic"), 0);
     }
-
-
-
 
     //material properties
     material->m_shader->SetVec3f("material.ambient", material->ambient.x, material->ambient.y, material->ambient.z);

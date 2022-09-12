@@ -14,24 +14,18 @@ enum LightType
 	e_none
 };
 
-class DirLight
+struct DirLight
 {
-public:
+	glm::vec3 m_LightCol = glm::vec3(1.0f, 1.0f, 1.0f);
 
 	glm::vec3 m_Direction = { -0.2f, -1.0f, -0.3f };
-	LightType m_type = e_dirLight;
-	glm::vec3 m_LightCol = glm::vec3(1.0f, 1.0f, 1.0f);
 	bool isWorking = true;
 
-
-private:
-
+	LightType m_type = e_dirLight;
 };
 
-class PointLight
+struct PointLight
 {
-public:
-
 	glm::vec3 m_lightPos = glm::vec3(-.250f, 0.310f, 1.0f);
 
 	glm::vec3 m_LightCol = glm::vec3(1.0f, 1.0f, 1.0f);
@@ -39,34 +33,22 @@ public:
 	float intensity = 1;
 
 	bool isWorking = true;
-	float ambientStrength = 0.1;
-
-	float linear = 0.027f;
-	float quadratic = 0.028f;
 
 	LightType m_type = e_pointLight;
-
-	glm::vec3 Getlightpos();
 };
 
-class SpotLight
+struct SpotLight
 {
-public:
-
 	glm::vec3 m_lightPos = glm::vec3(-.250f, 0.310f, 1.0f);
+
 	glm::vec3 m_Direction = { -0.2f, -1.0f, -0.3f };
+
+	glm::vec3 m_LightCol = glm::vec3(1.0f, 1.0f, 1.0f);
 
 	float cutOff = 23.5f;
 	float outerCutOff = 27.5f;
 
-	float linear = 0.027f;
-	float quadratic = 0.028f;
-	//bool cameraMimic = false;
-
-	glm::vec3 m_LightCol = glm::vec3(1.0f, 1.0f, 1.0f);
-
 	bool isWorking = true;
-
 	LightType m_type = e_spotLight;
 };
 
