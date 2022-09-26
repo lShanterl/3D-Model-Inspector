@@ -55,6 +55,7 @@
     <ClInclude Include="src\Material.hpp" />
     <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\Renderer.h" />
+    <ClInclude Include="src\SceneObjects.hpp" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\SimpleLogging\SimpleLogging.hpp" />
     <ClInclude Include="src\Texture.hpp" />

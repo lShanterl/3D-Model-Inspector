@@ -6,11 +6,12 @@
 #include "vendor/glm/glm.hpp"
 #include "vendor/glm/gtc/matrix_transform.hpp"
 
-enum LightType
+enum ObjectType
 {
 	e_dirLight,
 	e_pointLight,
 	e_spotLight,
+	e_model,
 	e_none
 };
 
@@ -21,7 +22,7 @@ struct DirLight
 	glm::vec3 m_Direction = { -0.2f, -1.0f, -0.3f };
 	bool isWorking = true;
 
-	LightType m_type = e_dirLight;
+	ObjectType m_type = e_dirLight;
 };
 
 struct PointLight
@@ -34,7 +35,7 @@ struct PointLight
 
 	bool isWorking = true;
 
-	LightType m_type = e_pointLight;
+	ObjectType m_type = e_pointLight;
 };
 
 struct SpotLight
@@ -49,7 +50,7 @@ struct SpotLight
 	float outerCutOff = 27.5f;
 
 	bool isWorking = true;
-	LightType m_type = e_spotLight;
+	ObjectType m_type = e_spotLight;
 };
 
 #endif

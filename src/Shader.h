@@ -15,6 +15,7 @@ class Shader
 public:
 	Shader(const std::string&& vertSource, const std::string&& fragSource);
 	~Shader();
+	const char* test;
 
 	const void Bind() const;
 	const void Unbind() const;

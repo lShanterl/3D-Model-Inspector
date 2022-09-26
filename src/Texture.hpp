@@ -3,7 +3,10 @@
 #ifndef TEXTURE_HPP
 #define TEXTURE_HPP
 
-#include "Renderer.h"
+#include <string>
+#include "Commons.h"
+#include "vendor/stb/stb_image/stb_image.hpp"
+
 
 class Texture
 {

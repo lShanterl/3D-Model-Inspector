@@ -5,16 +5,14 @@
 #define RENDERER_H
 
 #include <GL/glew.h>
-#include "IndexBuffer.h"
-#include "Shader.h"
-#include "VertexArray.h"
+#include "Model.h"
 
 class Renderer
 {
 public:
 	void Clear();
 	void SetClearColor(float r, float g, float b, float a);
-	void Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader);
+	void Draw(Model& mesh);
 private:
 	
 };

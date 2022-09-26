@@ -1,13 +1,29 @@
 #include "Renderer.h"
 #include <iostream>
 
-void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader)
+void Renderer::Draw(Model& model)
 {
-    va.Bind();
+	model.m_vao->Bind();
     //ib.Bind();
-    shader.Bind();
 
-	glDrawArrays(GL_TRIANGLES, 0, va.GetCount());
+    model.m_material->m_shader->Bind();
+	
+	if (model.m_material->albedoTexture != nullptr)
+	{
+		glActiveTexture(GL_TEXTURE0);
+		model.m_material->albedoTexture->Bind(0);
+		model.m_material->m_shader->SetInt("material.diffuse", 0);
+	}
+
+
+	if (model.m_material->specularTexture != nullptr)
+	{
+		glActiveTexture(GL_TEXTURE1);
+		model.m_material->specularTexture->Bind(1);
+		model.m_material->m_shader->SetInt("material.specular", 1);
+	}
+
+	glDrawArrays(GL_TRIANGLES, 0, model.m_vao->GetCount());
 }
 void Renderer::Clear()
 {

@@ -1,10 +1,23 @@
 #include "Model.h"
-
-Model::Model(const std::string&& filePath, Material* material)
-    :m_FilePath(filePath), m_material(material)
+Model::Model(Shader* shader, const std::string location)
 {
+    m_material = new Material(shader);
+    m_vao = nullptr;
+    m_ib = nullptr;
+
+    CreateMesh(location);
+}
+
+void Model::CreateMesh(const std::string location)
+{
+    if(m_vao != nullptr)
+        delete(m_vao);
+    if(m_ib != nullptr)
+        delete(m_ib);
+
     std::ifstream inputStream;
     std::string stringLine;
+    m_FilePath = location;
 
     inputStream.open(m_FilePath);
 
@@ -27,7 +40,7 @@ Model::Model(const std::string&& filePath, Material* material)
         const std::string header(stringLine.substr(0, stringLine.find_first_of(' ')));
         const std::string content(stringLine.substr(header.length() + 1, stringLine.length() - header.length() - 1));
 
-       // std::cout << "Header: \"" << header << "\", Content: \"" << content << "\"\n";
+        // std::cout << "Header: \"" << header << "\", Content: \"" << content << "\"\n";
 
         if (header == "v")
         {
@@ -78,13 +91,13 @@ Model::Model(const std::string&& filePath, Material* material)
             unsigned int vertAmount;
 
             std::string verticesCount[4];
-			
+
             std::istringstream ss2(content);
-            
+
             for (auto& v : verticesCount)
             {
-				if(ss.good())
-                    ss >> v; 
+                if (ss.good())
+                    ss >> v;
             }
 
             if (verticesCount[3] != "")
@@ -93,18 +106,16 @@ Model::Model(const std::string&& filePath, Material* material)
 
                 for (auto& v : vertices)
                 {
-                    
+
                     static int h = 0;
                     h++;
                     ss2 >> v;
-					
-                    //std::cout << v << " checking vertices" << std::endl;
                 }
 
                 unsigned int quadPos[4];
                 unsigned int quadTextCoord[4];
                 unsigned int quadNormals[4];
-				
+
 
                 for (int i = 0; i < 4; i++)
                 {
@@ -112,49 +123,46 @@ Model::Model(const std::string&& filePath, Material* material)
                     std::string str{ "" };
                     str.reserve(8);
 
-                        std::getline(amon, str, '/');
-						
-                        quadPos[i] = std::stoi(str);
+                    std::getline(amon, str, '/');
+
+                    quadPos[i] = std::stoi(str);
 
 
-                        std::getline(amon, str, '/');
-                        quadTextCoord[i] = std::stoi(str);
+                    std::getline(amon, str, '/');
+                    quadTextCoord[i] = std::stoi(str);
 
 
 
-                        std::getline(amon, str, '/');
-                        quadNormals[i] = std::stoi(str);
+                    std::getline(amon, str, '/');
+                    quadNormals[i] = std::stoi(str);
 
-                        
+
                 }
-                //std::cout << "[DONE] inserting to quads\n";
-				
+				// if object has four vertices, split it into two triangles
                 iPositions.emplace_back(quadPos[0]);
                 iTexCoords.emplace_back(quadTextCoord[0]);
                 iNormals.emplace_back(quadNormals[0]);
-				
+
                 iPositions.emplace_back(quadPos[1]);
                 iTexCoords.emplace_back(quadTextCoord[1]);
                 iNormals.emplace_back(quadNormals[1]);
-				
+
                 iPositions.emplace_back(quadPos[2]);
                 iTexCoords.emplace_back(quadTextCoord[2]);
                 iNormals.emplace_back(quadNormals[2]);
 
-				iPositions.emplace_back(quadPos[0]);
-				iTexCoords.emplace_back(quadTextCoord[0]);
-				iNormals.emplace_back(quadNormals[0]);
+                iPositions.emplace_back(quadPos[0]);
+                iTexCoords.emplace_back(quadTextCoord[0]);
+                iNormals.emplace_back(quadNormals[0]);
 
-				iPositions.emplace_back(quadPos[2]);
-				iTexCoords.emplace_back(quadTextCoord[2]);
-				iNormals.emplace_back(quadNormals[2]);
+                iPositions.emplace_back(quadPos[2]);
+                iTexCoords.emplace_back(quadTextCoord[2]);
+                iNormals.emplace_back(quadNormals[2]);
 
-				iPositions.emplace_back(quadPos[3]);
-				iTexCoords.emplace_back(quadTextCoord[3]);
-				iNormals.emplace_back(quadNormals[3]);
-                
-                //std::cout << "[DONE] ipushes\n";
-			}			
+                iPositions.emplace_back(quadPos[3]);
+                iTexCoords.emplace_back(quadTextCoord[3]);
+                iNormals.emplace_back(quadNormals[3]);
+            }
             else if (verticesCount[3] == "")
             {
                 std::string vertices[3];
@@ -178,15 +186,13 @@ Model::Model(const std::string&& filePath, Material* material)
                     iNormals.emplace_back(std::stoi(str));
                 }
             }
-            //std::cout << "[DONE] if statement \n\n" << std::endl;
-        }   
+        }
     }
     inputStream.close();
 
     std::vector<Vertex> vertices;
-    //std::cout << "before resize\n";
+
     vertices.resize(iPositions.size(), Vertex());
-    //std::cout << "after resize\n";
 
     for (size_t i = 0; i < vertices.size(); i++)
     {
@@ -194,7 +200,6 @@ Model::Model(const std::string&& filePath, Material* material)
         vertices[i].texcoord = vTexCoords[iTexCoords[i] - 1];
         vertices[i].normal = vNormals[iNormals[i] - 1];
     }
-    //std::cout << "end of the loop\n";
 
     VertexBufferLayout layout;
 
@@ -203,23 +208,5 @@ Model::Model(const std::string&& filePath, Material* material)
     layout.Push<float>(3);
 
     GLCall(m_vao = new VertexArray(vertices.data(), sizeof(vertices[0]) * vertices.size(), layout));
-
-    if (m_material->albedoTexture != nullptr)
-    {
-        glActiveTexture(GL_TEXTURE0);
-        m_material->albedoTexture->Bind(0);
-        m_material->m_shader->SetInt("material.diffuse", 0);
-    }
-
-
-    if (m_material->specularTexture != nullptr)
-    {
-        glActiveTexture(GL_TEXTURE1);
-        m_material->specularTexture->Bind(1);
-        m_material->m_shader->SetInt("material.specular", 1);
-    }
-        
-
-
 }
 

@@ -33,6 +33,7 @@
 #include "Light.hpp"
 #include "Material.hpp"
 #include "Editor.hpp"
+#include "SceneObjects.hpp"
 
 
 namespace Application

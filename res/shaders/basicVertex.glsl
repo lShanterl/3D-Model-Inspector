@@ -8,8 +8,6 @@ out vec2 v_TexCoords;
 out vec3 Normal;
 out vec3 fragPos;
 
-uniform mat4 u_MVP;
-
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;

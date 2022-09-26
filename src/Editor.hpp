@@ -3,8 +3,10 @@
 #ifndef EDITOR_HPP
 #define EDITOR_HPP
 
-#include "Light.hpp"
+
 #include "Camera.hpp"
+#include "SceneObjects.hpp"
+
 
 #include "Commons.h"
 #include "imgui.h"
@@ -16,14 +18,15 @@
 #include <string>
 #include <vector>
 
+
 namespace editor
 {
-	inline void* m_LightPointer;
-	inline LightType m_LightType;
+	inline void* m_EditorPointer;
+	inline ObjectType m_Type;
 	inline int m_index;
 
-	void SetEditor(void* light, LightType type, int index);
-	void RenderLightButtons(std::vector<PointLight>& pointLights, std::vector<DirLight>& dirLights, std::vector<SpotLight>& spotLights, Camera* camera);
+	void SetEditor(void* object, ObjectType type, int index);
+	void RenderLightButtons(Camera* camera);
 }
 
 #endif // !EDITOR_HPP

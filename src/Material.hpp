@@ -5,12 +5,13 @@
 #include "Texture.hpp"
 #include "Shader.h"
 
-
 struct Material
 {
-	Material(Texture* albedo, Texture* specular, Shader* shader)
-		:albedoTexture(albedo), specularTexture(specular), m_shader(shader)
+	Material(Shader* shader)
+		:m_shader(shader)
 	{
+		albedoTexture = nullptr;
+		specularTexture = nullptr;
 	}
 	~Material()
 	{
@@ -20,11 +21,25 @@ struct Material
 	Texture* albedoTexture;
 	Texture* specularTexture;
 	Shader* m_shader;
+
+	void SetTextures(const char* albedo, const char* specular)
+	{
+		if(albedoTexture != nullptr)
+			delete(albedoTexture);
+		if(specularTexture != nullptr)
+			delete(specularTexture);
+		specularTexture = new Texture(specular);
+		albedoTexture =   new Texture(albedo);  
+	}
+
+	bool m_useAlbedo = false;
+	bool m_useSpecular = false;
+
+	char modelPath[100] = "";
+	char albedoTexPath[100] = "";
+	char specularTexPath[100] = "";
+
 	float shininess = 24.0f;
-	glm::vec3 ambient = glm::vec3(0.04);
-	glm::vec3 specular = { 0.5f, 0.5f, 0.5f };
-
-
 };
 
 #endif // !MATERIAL_HPP
