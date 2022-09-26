@@ -35,18 +35,14 @@
 #include "Editor.hpp"
 #include "SceneObjects.hpp"
 
-
 namespace Application
 {
-
 	void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
 	void Init();
 	void Update();
 	void Exit();
-	bool IsRunning();
-	void SetUniforms();
-	
+	bool IsRunning();	
 }
 
 
