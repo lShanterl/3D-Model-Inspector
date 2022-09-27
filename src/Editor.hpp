@@ -19,7 +19,7 @@
 #include <vector>
 
 
-namespace editor
+namespace gui
 {
 	inline void* m_EditorPointer;
 	inline ObjectType m_Type;

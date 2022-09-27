@@ -35,9 +35,9 @@ struct Material
 	bool m_useAlbedo = false;
 	bool m_useSpecular = false;
 
-	char modelPath[100] = "";
-	char albedoTexPath[100] = "";
-	char specularTexPath[100] = "";
+	char modelPath[65] = "";
+	char albedoTexPath[65] = "";
+	char specularTexPath[65] = "";
 
 	float shininess = 24.0f;
 };

@@ -66,7 +66,7 @@ void Application::Init()
     ImGuiStyle& style = ImGui::GetStyle();
     style.WindowRounding = 5;
     style.FrameRounding = 5;
-    //style.Colors[ImGuiCol_Header] = ImVec4(0.83, 0.5, 0.25, 1);
+    //style.Colors[ImGuiCol_Header] = ImVec4(0.32, 0.5, 0.25, 1);
 }
 
 void Application::Update()
@@ -88,7 +88,7 @@ void Application::Update()
 
         renderer->SetUniformsAndRender();
 
-        editor::RenderLightButtons(camera);
+        gui::RenderLightButtons(camera);
 
         ImGui::Render();
 
@@ -109,7 +109,7 @@ void Application::Exit()
 
     delete(camera);
     delete(renderer);
-    editor::m_EditorPointer = nullptr;
+    gui::m_EditorPointer = nullptr;
 }
 
 bool Application::IsRunning()

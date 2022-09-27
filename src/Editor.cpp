@@ -1,14 +1,14 @@
 #include "Editor.hpp"
 
 
-void editor::SetEditor(void* object, ObjectType type, int index)
+void gui::SetEditor(void* object, ObjectType type, int index)
 {
 	m_EditorPointer = object;
 	m_Type = type;
 	m_index = index;
 }
 
-void editor::RenderLightButtons(Camera* camera)
+void gui::RenderLightButtons(Camera* camera)
 {
 	ImGuiWindowFlags window_flags = 0;
 	window_flags =
@@ -58,7 +58,7 @@ void editor::RenderLightButtons(Camera* camera)
 			std::string buttonName = "pointLight: " + std::to_string(i);
 			if (ImGui::Button(buttonName.c_str(), ImVec2(ImGui::GetWindowWidth() - 15, 35)))
 			{
-				editor::SetEditor(&scene::m_PointLights[i], scene::m_PointLights[i].m_type, i);
+				gui::SetEditor(&scene::m_PointLights[i], scene::m_PointLights[i].m_type, i);
 			}
 
 		}
@@ -67,7 +67,7 @@ void editor::RenderLightButtons(Camera* camera)
 			std::string buttonName = "dirLight: " + std::to_string(i);	
 			if (ImGui::Button(buttonName.c_str(), ImVec2(ImGui::GetWindowWidth() - 15, 35)))
 			{
-				editor::SetEditor(&scene::m_DirectionalLights[i], scene::m_DirectionalLights[i].m_type, i);
+				gui::SetEditor(&scene::m_DirectionalLights[i], scene::m_DirectionalLights[i].m_type, i);
 			}
 		}
 		for (int i = 0; i < scene::m_SpotLights.size(); i++)
@@ -75,7 +75,7 @@ void editor::RenderLightButtons(Camera* camera)
 			std::string buttonName = "spotLight: " + std::to_string(i);
 			if (ImGui::Button(buttonName.c_str(), ImVec2(ImGui::GetWindowWidth() - 15, 35)))
 			{
-				editor::SetEditor(&scene::m_SpotLights[i], scene::m_SpotLights[i].m_type, i);
+				gui::SetEditor(&scene::m_SpotLights[i], scene::m_SpotLights[i].m_type, i);
 			}
 		}
 
@@ -98,7 +98,7 @@ void editor::RenderLightButtons(Camera* camera)
 			std::string buttonName = "model: " + std::to_string(i);
 			if (ImGui::Button(buttonName.c_str(), ImVec2(ImGui::GetWindowWidth() - 15, 35)))
 			{
-				editor::SetEditor(&scene::m_Models[i], scene::m_Models[i].m_type, i);
+				gui::SetEditor(&scene::m_Models[i], scene::m_Models[i].m_type, i);
 
 			}
 
