@@ -229,6 +229,7 @@ void gui::RenderLightButtons(Camera* camera)
 					unsigned char darkGray[4] = { 36,36,36,255 };
 					model->m_material->specularTexture = new Texture(darkGray, 1, 1);
 				}
+				model->CreateMesh(model->m_FilePath);
 
 			}
 		}
