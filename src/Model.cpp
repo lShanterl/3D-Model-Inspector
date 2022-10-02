@@ -4,7 +4,6 @@ Model::Model(Shader* shader, const std::string location)
     m_material = new Material(shader);
     m_vao = nullptr;
     m_ib = nullptr;
-
     CreateMesh(location);
 }
 
@@ -18,12 +17,14 @@ void Model::CreateMesh(const std::string location)
     std::ifstream inputStream;
     std::string stringLine;
     m_FilePath = location;
+    m_FilePath.resize(100);
 
     inputStream.open(m_FilePath);
 
     if (!inputStream.is_open())
     {
         std::cout << "OBJ FILE NOT FOUND!\n";
+
     }
 
     std::vector<glm::vec3> vPositions;

@@ -194,7 +194,7 @@ void gui::RenderLightButtons(Camera* camera)
 			ImGui::Checkbox("Use Albedo Texture", &model->m_material->m_useAlbedo);
 			ImGui::Checkbox("Use Specular Texture", &model->m_material->m_useSpecular);	
 
-			ImGui::InputText("model path", &model->m_FilePath[0], sizeof(char) * 65);
+			ImGui::InputText("model path", &model->m_FilePath[0], sizeof(char) * 100);
 			if (model->m_material->m_useAlbedo)
 			{
 				if (ImGui::InputText("albedo texture path", model->m_material->albedoTexPath, sizeof(char) * 65));
@@ -231,6 +231,12 @@ void gui::RenderLightButtons(Camera* camera)
 				}
 				model->CreateMesh(model->m_FilePath);
 
+			}
+			if (ImGui::Button("delete"))
+			{
+				scene::m_Models.erase(scene::m_Models.begin() + m_index);
+				m_EditorPointer = nullptr;
+				m_Type = e_none;
 			}
 		}
 	}

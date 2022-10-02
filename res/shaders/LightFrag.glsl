@@ -93,7 +93,10 @@ void main()
         
 
     FragColor = vec4(result, 1.0);
-    //FragColor = vec4(1,0,0,1);
+
+    // apply gamma correction
+    //float gamma = 2.2;
+    //FragColor.rgb = pow(FragColor.rgb, vec3(1.0/gamma));
 }
    
 
@@ -117,10 +120,11 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     // diffuse shading
     float diff = max(dot(normal, lightDir), 0.0);
     // specular shading
-	//vec3 halfwayDir = normalize(lightDir + viewDir);
+	vec3 halfwayDir = normalize(lightDir + viewDir);
 	
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+    //vec3 reflectDir = reflect(-lightDir, normal);
+	
+    float spec = pow(max(dot(normal, halfwayDir), 0.0), material.shininess);
 	
     // attenuation
     float distance    = length(light.position - fragPos);
@@ -144,8 +148,11 @@ vec3 CalcSpotLights(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     vec3 diffuse = diff * light.lightColor * texture(material.diffuse, v_TexCoords).rgb;
 
     //specular
-    vec3 reflectDir = reflect(-lightDir, normal);  
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+    //vec3 reflectDir = reflect(-lightDir, normal);  
+	
+	vec3 halfwayDir = normalize(lightDir + viewDir);
+
+    float spec = pow(max(dot(viewDir, halfwayDir), 0.0), material.shininess);
     vec3 specular = light.lightColor * spec * texture(material.specular, v_TexCoords).rgb;
 
     //spotlight soft edges 

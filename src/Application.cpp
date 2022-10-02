@@ -6,6 +6,7 @@ Renderer* renderer;
 
 constexpr int width = 1920, height = 1080;
 
+
 bool bIsRunning = true;
 
 void Application::framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -35,9 +36,10 @@ void Application::Init()
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
 
-    glfwSwapInterval(1);
-
     glEnable(GL_DEPTH_TEST);
+    
+
+    glfwSwapInterval(1);
 
     glfwSetCursorPosCallback(window, Camera::mouse_callback);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
@@ -71,36 +73,43 @@ void Application::Init()
 
 void Application::Update()
 {
-    while (!glfwWindowShouldClose(window))
-    {
-         /* Render here */
-		glfwGetFramebufferSize(window, &camera->width, &camera->height); // get the size of the window and update the camera
 
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
+        while (!glfwWindowShouldClose(window))
+        {
+            /* Render here */
+            //glfwGetFramebufferSize(window, &camera->width, &camera->height);
+            //
+            //if(camera->width > 0 && camera->height > 0)
 
-        camera->ProcessInput(window);
+            glfwGetFramebufferSize(window, &camera->width, &camera->height);
 
-        camera->CameraFocusing(window);
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
 
-        renderer->Clear();
+            camera->ProcessInput(window);
 
-        renderer->SetUniformsAndRender();
+            camera->CameraFocusing(window);
 
-        gui::RenderLightButtons(camera);
+            renderer->Clear();
 
-        ImGui::Render();
+            if(camera->width >0 && camera->height > 0)
+                renderer->SetUniformsAndRender();
 
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+            gui::RenderLightButtons(camera);
 
-        /* Swap front and back buffers */
-        glfwSwapBuffers(window);
+            ImGui::Render();
 
-        /* Poll for and process events */
-        glfwPollEvents();
-        bIsRunning = false;
-    }
+            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+            /* Swap front and back buffers */
+            glfwSwapBuffers(window);
+
+            /* Poll for and process events */
+            glfwPollEvents();
+            bIsRunning = false;
+        }
+   
 }
 
 void Application::Exit()
